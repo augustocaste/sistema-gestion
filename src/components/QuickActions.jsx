@@ -6,15 +6,61 @@ import {
 } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Plus, FileText, Users, Package } from "lucide-react";
-
-const actions = [
-  { title: "Nuevo Producto", icon: Package },
-  { title: "Nuevo Cliente", icon: Users },
-  { title: "Registrar Pago", icon: FileText },
-  { title: "Nuevo Trabajador", icon: Plus },
-];
+import { useState } from "react";
+import { ProductoModal } from "./modals/ProductModal";
+import { createProducto } from "../supabase/productos";
 
 export function QuickActions() {
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
+  const [modoModal, setModoModal] = useState("crear");
+  function abrirModalCrear() {
+    setProductoSeleccionado(null);
+    setModoModal("crear");
+    setModalAbierto(true);
+  }
+
+  const actions = [
+    {
+      title: "Nuevo Producto",
+      icon: Package,
+      onClick: () => {
+        abrirModalCrear();
+        // navigate("/productos/nuevo");
+      },
+    },
+    {
+      title: "Nuevo Cliente",
+      icon: Users,
+      onClick: () => {
+        console.log("Crear Cliente");
+      },
+    },
+    {
+      title: "Registrar Pago",
+      icon: FileText,
+      onClick: () => {
+        console.log("Registrar pago");
+      },
+    },
+    {
+      title: "Nuevo Trabajador",
+      icon: Plus,
+      onClick: () => {
+        console.log("Crear trabajador");
+      },
+    },
+  ];
+
+  async function handleGuardarProducto(formData) {
+    try {
+      await createProducto(formData);
+      setModalAbierto(false);
+      return { ok: true };
+    } catch {
+      return { ok: false };
+    }
+  }
   return (
     <Card className="border-border">
       <CardHeader>
@@ -28,6 +74,7 @@ export function QuickActions() {
             <Button
               key={action.title}
               variant="outline"
+              onClick={action.onClick}
               className="h-auto flex-col gap-2 py-4 border-border hover:bg-accent bg-transparent"
             >
               <action.icon className="w-5 h-5" />
@@ -36,6 +83,13 @@ export function QuickActions() {
           ))}
         </div>
       </CardContent>
+      <ProductoModal
+        abierto={modalAbierto}
+        onCerrar={() => setModalAbierto(false)}
+        producto={productoSeleccionado}
+        modo={modoModal}
+        onGuardar={handleGuardarProducto}
+      />
     </Card>
   );
 }

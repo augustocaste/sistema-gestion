@@ -1,6 +1,6 @@
+import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/layouts/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, MoreVertical, Package } from "lucide-react";
+import { Plus, MoreVertical, Search } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,175 +19,245 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
+import { ProductoModal } from "@/components/modals/ProductModal";
+
+import {
+  getProductos,
+  createProducto,
+  updateProducto,
+  deleteProducto,
+} from "@/supabase/productos";
+
 export function Productos() {
-  const productos = [
-    {
-      id: "1",
-      nombre: "Laptop Dell XPS 15",
-      sku: "LPT-001",
-      categoria: "Electrónica",
-      precio: 1299.99,
-      stock: 15,
-      estado: "Activo",
-    },
-    {
-      id: "2",
-      nombre: "Mouse Logitech MX Master",
-      sku: "MSE-002",
-      categoria: "Accesorios",
-      precio: 99.99,
-      stock: 45,
-      estado: "Activo",
-    },
-    {
-      id: "3",
-      nombre: "Teclado Mecánico",
-      sku: "KBD-003",
-      categoria: "Accesorios",
-      precio: 149.99,
-      stock: 8,
-      estado: "Activo",
-    },
-    {
-      id: "4",
-      nombre: 'Monitor LG 27"',
-      sku: "MON-004",
-      categoria: "Electrónica",
-      precio: 349.99,
-      stock: 3,
-      estado: "Bajo stock",
-    },
-    {
-      id: "5",
-      nombre: "Webcam HD",
-      sku: "WBC-005",
-      categoria: "Accesorios",
-      precio: 79.99,
-      stock: 0,
-      estado: "Agotado",
-    },
-  ];
+  const [productos, setProductos] = useState([]);
+  const [pagina, setPagina] = useState(1);
+  const [totalProductos, setTotalProductos] = useState(0);
+  const [search, setSearch] = useState("");
+  const pageSize = 10;
+
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
+  const [modoModal, setModoModal] = useState("editar");
+
+  const [deleteModalAbierto, setDeleteModalAbierto] = useState(false);
+  const [elementoAEliminar, setElementoAEliminar] = useState(null);
+
+  async function fetchProductos(page = 1, filtro = search) {
+    try {
+      const { data, total } = await getProductos(filtro, page, pageSize);
+      setProductos(data);
+      setTotalProductos(total);
+      setPagina(page);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      fetchProductos(1, search);
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [search]);
+
+  const totalPaginas = Math.ceil(totalProductos / pageSize);
+
+  function abrirModalCrear() {
+    setProductoSeleccionado(null);
+    setModoModal("crear");
+    setModalAbierto(true);
+  }
+
+  function abrirModalEditar(producto) {
+    setProductoSeleccionado(producto);
+    setModoModal("editar");
+    setModalAbierto(true);
+  }
+
+  async function handleGuardarProducto(formData) {
+    try {
+      if (modoModal === "editar") {
+        await updateProducto(productoSeleccionado.id, formData);
+      } else {
+        await createProducto(formData);
+      }
+      setModalAbierto(false);
+      fetchProductos(pagina, search);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error };
+    }
+  }
+
+  function abrirModalEliminar(producto) {
+    setElementoAEliminar(producto);
+    setDeleteModalAbierto(true);
+  }
+
+  async function handleEliminar() {
+    if (!elementoAEliminar) return;
+
+    try {
+      await deleteProducto(elementoAEliminar.id);
+      fetchProductos(pagina, search);
+      return { ok: true };
+    } catch (err) {
+      console.error(err);
+      return { ok: false };
+    } finally {
+      setDeleteModalAbierto(false);
+      setElementoAEliminar(null);
+    }
+  }
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        <div className="flex items-start justify-between">
+      {/* CONTENEDOR CENTRADO */}
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 space-y-6">
+        {/* HEADER */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Productos</h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground">
               Gestiona tu inventario
             </p>
           </div>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" /> Nuevo Producto
+
+          <Button className="gap-2 w-full sm:w-auto" onClick={abrirModalCrear}>
+            <Plus className="h-4 w-4" />
+            Nuevo Producto
           </Button>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Package className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total</p>
-                <p className="text-2xl font-semibold">247</p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-secondary rounded-lg">
-                <Package className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">En Stock</p>
-                <p className="text-2xl font-semibold">198</p>
-              </div>
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-destructive/10 rounded-lg">
-                <Package className="h-5 w-5 text-destructive" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Agotados</p>
-                <p className="text-2xl font-semibold">12</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-
         <Card>
+          {/* BUSCADOR */}
           <div className="p-4 border-b">
-            <div className="relative">
+            <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por SKU o nombre..."
-                className="pl-9"
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar por nombre..."
+                className="pl-9 w-full border rounded-md p-2 text-sm"
               />
             </div>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Producto</TableHead>
-                <TableHead>SKU</TableHead>
-                <TableHead>Categoría</TableHead>
-                <TableHead className="text-right">Precio</TableHead>
-                <TableHead className="text-right">Stock</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {productos.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.nombre}</TableCell>
-                  <TableCell className="text-xs text-muted-foreground">
-                    {p.sku}
-                  </TableCell>
-                  <TableCell className="text-sm">{p.categoria}</TableCell>
-                  <TableCell className="text-right text-sm">
-                    ${p.precio}
-                  </TableCell>
-                  <TableCell className="text-right text-sm">
-                    {p.stock}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        p.estado === "Activo"
-                          ? "default"
-                          : p.estado === "Agotado"
-                          ? "destructive"
-                          : "outline"
-                      }
-                    >
-                      {p.estado}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Editar</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+
+          {/* TABLA RESPONSIVE */}
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Producto</TableHead>
+                  <TableHead className="text-right">Precio</TableHead>
+                  <TableHead className="text-right">Stock</TableHead>
+                  <TableHead className="hidden lg:table-cell">Estado</TableHead>
+                  <TableHead className="hidden lg:table-cell">Cuotas</TableHead>
+                  <TableHead className="w-[50px]" />
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+
+              <TableBody>
+                {productos.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center text-muted-foreground py-6"
+                    >
+                      No se encontraron productos
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  productos.map((p) => (
+                    <TableRow key={p.id}>
+                      <TableCell className="font-medium">{p.nombre}</TableCell>
+                      <TableCell className="text-right">
+                        {p.precio_contado}
+                      </TableCell>
+                      <TableCell className="text-right">{p.stock}</TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        <Badge
+                          variant={p.stock > 0 ? "default" : "destructive"}
+                        >
+                          {p.stock > 0 ? "Activo" : "Sin stock"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        {p.cantidad_cuotas}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => abrirModalEditar(p)}
+                            >
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => abrirModalEliminar(p)}
+                            >
+                              Eliminar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* PAGINACIÓN */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4">
+            <p className="text-sm text-muted-foreground">
+              Página {pagina} de {totalPaginas} | Total: {totalProductos}
+            </p>
+
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchProductos(pagina - 1)}
+                disabled={pagina === 1}
+              >
+                Anterior
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchProductos(pagina + 1)}
+                disabled={pagina === totalPaginas || totalPaginas === 0}
+              >
+                Siguiente
+              </Button>
+            </div>
+          </div>
         </Card>
+
+        {/* MODALES */}
+        <ProductoModal
+          abierto={modalAbierto}
+          onCerrar={() => setModalAbierto(false)}
+          producto={productoSeleccionado}
+          modo={modoModal}
+          onGuardar={handleGuardarProducto}
+        />
+
+        <ConfirmDeleteModal
+          abierto={deleteModalAbierto}
+          onCerrar={() => setDeleteModalAbierto(false)}
+          titulo={`Eliminar producto: ${elementoAEliminar?.nombre}`}
+          mensaje="Esta acción no se puede deshacer. ¿Deseas continuar?"
+          onConfirmar={handleEliminar}
+        />
       </div>
     </DashboardLayout>
   );

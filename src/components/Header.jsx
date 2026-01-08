@@ -15,14 +15,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-card px-6">
       <div className="flex-1 flex items-center gap-4">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Buscar..."
-            className="pl-9 bg-background border-border"
-          />
-        </div>
+        <div className="relative w-full max-w-md"></div>
       </div>
 
       <div className="flex items-center gap-2">

@@ -4,12 +4,14 @@ import { Trabajadores } from "./pages/Trabajadores";
 import { Productos } from "./pages/Productos";
 import { Clientes } from "./pages/Clientes";
 import { Pagos } from "./pages/Pagos";
+import { Toaster } from "sonner";
 // Si creas más páginas, impórtalas aquí
 // import Productos from "./pages/Productos";
 
 function App() {
   return (
     <BrowserRouter>
+      <Toaster richColors position="top-right" />
       <Routes>
         {/* La ruta principal "/" carga tu Dashboard */}
         <Route path="/" element={<Home />} />
