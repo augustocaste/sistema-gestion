@@ -1,29 +1,31 @@
 import { Card, CardContent } from "../components/ui/card";
 import { Package, Users, UserCircle, TrendingUp } from "lucide-react";
+import {
+  getCantidadProductos,
+  getVentasDelMes,
+  getCantidadClientes,
+  getCantidadEmpleados,
+} from "@/supabase/estadisticas";
 
 const stats = [
   {
     title: "Total Productos",
-    value: "2,345",
-    change: "+12.5%",
+    value: await getCantidadProductos(),
     icon: Package,
   },
   {
     title: "Clientes Activos",
-    value: "1,234",
-    change: "+8.2%",
+    value: await getCantidadClientes(),
     icon: Users,
   },
   {
     title: "Trabajadores",
-    value: "56",
-    change: "+2",
+    value: await getCantidadEmpleados(),
     icon: UserCircle,
   },
   {
     title: "Ventas del Mes",
-    value: "$45,231",
-    change: "+23.1%",
+    value: await getVentasDelMes(),
     icon: TrendingUp,
   },
 ];
@@ -39,9 +41,6 @@ export function StatsCards() {
                 <p className="text-sm text-muted-foreground">{stat.title}</p>
                 <p className="text-2xl font-semibold tracking-tight">
                   {stat.value}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {stat.change} vs mes anterior
                 </p>
               </div>
               <div className="w-12 h-12 bg-secondary rounded-md flex items-center justify-center">

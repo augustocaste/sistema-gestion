@@ -5,6 +5,7 @@ export async function getProductos(search = "", page = 1, pageSize = 10) {
   let query = supabase
     .from("producto")
     .select("*", { count: "exact" }) // para obtener total de registros
+    .eq("activo", true)
     .order("id", { ascending: true })
     .range((page - 1) * pageSize, page * pageSize - 1);
 
@@ -31,7 +32,6 @@ export async function createProducto(producto) {
     nueve_cuotas,
     doce_cuotas,
   } = producto;
-
   const { data, error } = await supabase
     .from("producto")
     .insert([
@@ -44,6 +44,7 @@ export async function createProducto(producto) {
         seis_cuotas,
         nueve_cuotas,
         doce_cuotas,
+        activo: true,
       },
     ])
     .select();
@@ -64,7 +65,11 @@ export async function updateProducto(id, updates) {
 
 // 🔹 Eliminar un producto
 export async function deleteProducto(id) {
-  const { error } = await supabase.from("producto").delete().eq("id", id);
+  const { data, error } = await supabase
+    .from("producto")
+    .update({ activo: false })
+    .eq("id", id)
+    .select();
   if (error) throw error;
   return true;
 }

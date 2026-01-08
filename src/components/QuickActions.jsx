@@ -7,17 +7,30 @@ import {
 import { Button } from "../components/ui/button";
 import { Plus, FileText, Users, Package } from "lucide-react";
 import { useState } from "react";
-import { ProductoModal } from "./modals/ProductModal";
+import { ProductModal } from "./modals/ProductModal";
 import { createProducto } from "../supabase/productos";
+import { ClientModal } from "./modals/ClientModal";
+import { createCliente } from "../supabase/clientes";
 
 export function QuickActions() {
-  const [modalAbierto, setModalAbierto] = useState(false);
+  const [modalAbiertoProducto, setModalAbiertoProducto] = useState(false);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
-  const [modoModal, setModoModal] = useState("crear");
-  function abrirModalCrear() {
+  const [modoModalProducto, setModoModalProducto] = useState("crear");
+
+  const [modalAbiertoCliente, setModalAbiertoCliente] = useState(false);
+  const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
+  const [modoModalCliente, setModoModalCliente] = useState("crear");
+
+  function abrirModalCrearCliente() {
+    setClienteSeleccionado(null);
+    setModoModalCliente("crear");
+    setModalAbiertoCliente(true);
+  }
+
+  function abrirModalCrearProducto() {
     setProductoSeleccionado(null);
-    setModoModal("crear");
-    setModalAbierto(true);
+    setModoModalProducto("crear");
+    setModalAbiertoProducto(true);
   }
 
   const actions = [
@@ -25,15 +38,14 @@ export function QuickActions() {
       title: "Nuevo Producto",
       icon: Package,
       onClick: () => {
-        abrirModalCrear();
-        // navigate("/productos/nuevo");
+        abrirModalCrearProducto();
       },
     },
     {
       title: "Nuevo Cliente",
       icon: Users,
       onClick: () => {
-        console.log("Crear Cliente");
+        abrirModalCrearCliente();
       },
     },
     {
@@ -54,13 +66,24 @@ export function QuickActions() {
 
   async function handleGuardarProducto(formData) {
     try {
-      await createProducto(formData);
-      setModalAbierto(false);
+      const { error } = await createProducto(formData);
+      setModalAbiertoProducto(false);
       return { ok: true };
-    } catch {
-      return { ok: false };
+    } catch (error) {
+      return { ok: false, error };
     }
   }
+
+  async function handleGuardarCliente(formData) {
+    try {
+      const { error } = await createCliente(formData);
+      setModalAbiertoCliente(false);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error };
+    }
+  }
+
   return (
     <Card className="border-border">
       <CardHeader>
@@ -83,12 +106,19 @@ export function QuickActions() {
           ))}
         </div>
       </CardContent>
-      <ProductoModal
-        abierto={modalAbierto}
-        onCerrar={() => setModalAbierto(false)}
+      <ProductModal
+        abierto={modalAbiertoProducto}
+        onCerrar={() => setModalAbiertoProducto(false)}
         producto={productoSeleccionado}
-        modo={modoModal}
+        modo={modoModalProducto}
         onGuardar={handleGuardarProducto}
+      />
+      <ClientModal
+        abierto={modalAbiertoCliente}
+        onCerrar={() => setModalAbiertoCliente(false)}
+        cliente={clienteSeleccionado}
+        modo={modoModalCliente}
+        onGuardar={handleGuardarCliente}
       />
     </Card>
   );

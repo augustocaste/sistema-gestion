@@ -24,7 +24,7 @@ const CUOTAS_CONFIG = [
   { label: "12 Cuotas", name: "doce_cuotas", value: 12 },
 ];
 
-export function ProductoModal({
+export function ProductModal({
   abierto,
   onCerrar,
   producto = null,
@@ -98,10 +98,29 @@ export function ProductoModal({
       setLoading(false);
       return;
     }
+    if (
+      form.precio_contado < 0 ||
+      form.stock < 0 ||
+      form.cantidad_cuotas < 0 ||
+      form.tres_cuotas < 0 ||
+      form.seis_cuotas < 0 ||
+      form.nueve_cuotas < 0 ||
+      form.doce_cuotas < 0
+    ) {
+      toast.error(
+        "Por favor, ingresa valores válidos para precio, stock y cuotas"
+      );
+      setLoading(false);
+      return;
+    }
     try {
       const result = await onGuardar(form);
-      console.log(result);
       if (!result?.ok) {
+        if (result?.error?.code === "23505") {
+          // Codigo de error de violación de unicidad
+          toast.error("Ya existe un producto con este nombre");
+          return;
+        }
         toast.error("Ocurrió un error al guardar el producto");
         return;
       }
@@ -132,10 +151,12 @@ export function ProductoModal({
 
         <div className="grid gap-4 py-4">
           {/* Nombre */}
+
           <div>
             <label className="text-sm font-medium">Nombre</label>
             <Input
               name="nombre"
+              placeholder="Ingrese el nombre del producto"
               value={form.nombre}
               onChange={(e) =>
                 setForm((p) => ({ ...p, nombre: e.target.value }))
@@ -149,7 +170,8 @@ export function ProductoModal({
             <Input
               type="number"
               name="precio_contado"
-              value={form.precio_contado}
+              placeholder="Ingrese un valor numerico (0 si queda vacío)"
+              value={form.precio_contado === 0 ? "" : form.precio_contado}
               onChange={handleChange}
             />
           </div>
@@ -160,7 +182,8 @@ export function ProductoModal({
             <Input
               type="number"
               name="stock"
-              value={form.stock}
+              placeholder="Ingrese un valor numerico (0 si queda vacío)"
+              value={form.stock === 0 ? "" : form.stock}
               onChange={handleChange}
             />
           </div>
@@ -193,7 +216,8 @@ export function ProductoModal({
                 <Input
                   type="number"
                   name={cuota.name}
-                  value={form[cuota.name]}
+                  placeholder="Ingrese un valor numerico (0 si queda vacío)"
+                  value={form[cuota.name] === 0 ? "" : form[cuota.name]}
                   onChange={handleChange}
                 />
               </div>

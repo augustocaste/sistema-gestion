@@ -42,7 +42,7 @@ export function RecentActivity() {
     <Card className="border-border">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">
-          Actividad Reciente
+          Cuotas que vencen hoy
         </CardTitle>
       </CardHeader>
       <CardContent>

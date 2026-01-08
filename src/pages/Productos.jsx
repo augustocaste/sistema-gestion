@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, MoreVertical, Search } from "lucide-react";
+import { Plus, MoreVertical, Search, AlertTriangle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { ConfirmDeleteModal } from "@/components/modals/ConfirmDeleteModal";
-import { ProductoModal } from "@/components/modals/ProductModal";
+import { ProductModal } from "@/components/modals/ProductModal";
 
 import {
   getProductos,
@@ -84,6 +84,7 @@ export function Productos() {
       }
       setModalAbierto(false);
       fetchProductos(pagina, search);
+
       return { ok: true };
     } catch (error) {
       return { ok: false, error };
@@ -153,7 +154,9 @@ export function Productos() {
                   <TableHead className="text-right">Precio</TableHead>
                   <TableHead className="text-right">Stock</TableHead>
                   <TableHead className="hidden lg:table-cell">Estado</TableHead>
-                  <TableHead className="hidden lg:table-cell">Cuotas</TableHead>
+                  <TableHead className="hidden lg:table-cell">
+                    Cantidad de cuotas
+                  </TableHead>
                   <TableHead className="w-[50px]" />
                 </TableRow>
               </TableHeader>
@@ -243,7 +246,7 @@ export function Productos() {
         </Card>
 
         {/* MODALES */}
-        <ProductoModal
+        <ProductModal
           abierto={modalAbierto}
           onCerrar={() => setModalAbierto(false)}
           producto={productoSeleccionado}
