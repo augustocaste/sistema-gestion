@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -5,39 +6,32 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
-
-const activities = [
-  {
-    id: 1,
-    user: "María García",
-    action: "agregó un nuevo producto",
-    time: "Hace 2 horas",
-    initials: "MG",
-  },
-  {
-    id: 2,
-    user: "Juan Pérez",
-    action: "registró un pago",
-    time: "Hace 4 horas",
-    initials: "JP",
-  },
-  {
-    id: 3,
-    user: "Ana Martínez",
-    action: "actualizó información de cliente",
-    time: "Hace 5 horas",
-    initials: "AM",
-  },
-  {
-    id: 4,
-    user: "Carlos López",
-    action: "agregó un nuevo trabajador",
-    time: "Hace 1 día",
-    initials: "CL",
-  },
-];
+import { getCuotasVencidas } from "@/supabase/clientes";
+import { Button } from "@/components/ui/button";
+import { PlanPagosModal } from "@/components/modals/PlanPagosModal.jsx";
 
 export function RecentActivity() {
+  const [cuotas, setCuotas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [planSeleccionado, setPlanSeleccionado] = useState(null);
+  const [modalAbierto, setModalAbierto] = useState(false);
+
+  useEffect(() => {
+    async function fetchCuotas() {
+      try {
+        const data = await getCuotasVencidas();
+        setCuotas(data ?? []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCuotas();
+  }, []);
+
   return (
     <Card className="border-border">
       <CardHeader>
@@ -45,28 +39,74 @@ export function RecentActivity() {
           Cuotas que vencen hoy
         </CardTitle>
       </CardHeader>
+
       <CardContent>
+        {loading && (
+          <p className="text-sm text-muted-foreground">
+            Cargando cuotas que vencen hoy...
+          </p>
+        )}
+
+        {!loading && cuotas.length === 0 && (
+          <p className="text-sm text-muted-foreground">
+            No hay cuotas vencidas 🎉
+          </p>
+        )}
+
         <div className="space-y-4">
-          {activities.map((activity) => (
-            <div key={activity.id} className="flex items-start gap-3">
-              <Avatar className="w-9 h-9">
-                <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
-                  {activity.initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 space-y-1">
-                <p className="text-sm">
-                  <span className="font-medium">{activity.user}</span>{" "}
-                  <span className="text-muted-foreground">
-                    {activity.action}
-                  </span>
-                </p>
-                <p className="text-xs text-muted-foreground">{activity.time}</p>
+          {cuotas.map((cuota) => {
+            const compraProducto = cuota.plan_cuotas?.compra_producto?.[0];
+
+            const cliente =
+              cuota.plan_cuotas.compra_producto[0].compra.clientes;
+
+            const nombreCompleto = cliente
+              ? `${cliente.nombre} ${cliente.apellido}`
+              : "Cliente desconocido";
+
+            const initials = cliente
+              ? `${cliente.nombre?.[0] ?? ""}${cliente.apellido?.[0] ?? ""}`
+              : "--";
+
+            return (
+              <div key={cuota.id} className="flex items-start gap-3">
+                <Avatar className="w-9 h-9">
+                  <AvatarFallback className="bg-secondary text-secondary-foreground text-xs">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="flex-1 space-y-1">
+                  <p className="text-sm">
+                    <span className="font-medium">{nombreCompleto}</span>{" "}
+                    <span className="text-muted-foreground">
+                      tiene una cuota vencida
+                    </span>
+                  </p>
+
+                  <div className="flex items-center justify-between gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setPlanSeleccionado(cuota.plan_cuotas);
+                        setModalAbierto(true);
+                      }}
+                    >
+                      Ver plan de pagos
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </CardContent>
+      <PlanPagosModal
+        abierto={modalAbierto}
+        onCerrar={() => setModalAbierto(false)}
+        plan={planSeleccionado}
+      />
     </Card>
   );
 }

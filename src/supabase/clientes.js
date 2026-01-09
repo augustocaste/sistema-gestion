@@ -10,7 +10,7 @@ export async function getClientes(search = "", page = 1, pageSize = 10) {
     .range((page - 1) * pageSize, page * pageSize - 1);
 
   if (search) {
-    query = query.ilike("nombre", `%${search}%`);
+    query = query.or(`nombre.ilike.%${search}%,apellido.ilike.%${search}%`);
   }
 
   const { data, error, count } = await query;
@@ -21,7 +21,6 @@ export async function getClientes(search = "", page = 1, pageSize = 10) {
 
 // 🔹 Crear un cliente
 export async function createCliente(cliente) {
-  console.log("Creando cliente:", cliente);
   const { nombre, apellido, dni, telefono, direccion, observaciones } = cliente;
   const { data, error } = await supabase
     .from("cliente")
@@ -92,4 +91,79 @@ export async function getComprasCliente(idCliente) {
 
   if (error) throw error;
   return data;
+}
+
+export async function getCuotasVencidas() {
+  const { data, error } = await supabase
+    .from("cuota")
+    .select(
+      `
+      id,
+      nro_cuota,
+      fecha_vencimiento,
+      estado,
+      monto_actual_pagado,
+      plan_cuotas (
+        id,
+        monto_cuota,
+        cant_cuotas,
+        compra_producto (
+          id,
+          compra (
+            id,
+            clientes:cliente (
+              nombre,
+              apellido
+            )
+          )
+        )
+      )
+    `
+    )
+    .eq("fecha_vencimiento", new Date().toISOString())
+    .eq("estado", "pendiente")
+    .order("fecha_vencimiento", { ascending: true });
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getCuotasPorPlan(planCuotasId) {
+  const { data, error } = await supabase
+    .from("cuota")
+    .select(
+      `
+      id,
+      nro_cuota,
+      fecha_vencimiento,
+      fecha_pagada,
+      estado,
+      monto_actual_pagado
+    `
+    )
+    .eq("id_plan_cuotas", planCuotasId)
+    .order("nro_cuota", { ascending: true });
+
+  if (error) throw error;
+  return data;
+}
+
+export async function obtenerPlanCuotasPorProducto(compraProductoId) {
+  const { data, error } = await supabase
+    .from("compra_producto")
+    .select(
+      `
+      plan_cuotas (
+        id,
+        monto_cuota,
+        cant_cuotas
+      )
+    `
+    )
+    .eq("id", compraProductoId)
+    .single();
+
+  if (error) throw error;
+
+  return data.plan_cuotas;
 }

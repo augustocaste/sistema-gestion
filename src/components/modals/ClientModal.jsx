@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { toast } from "sonner";
 
 export function ClientModal({
@@ -23,7 +22,7 @@ export function ClientModal({
     apellido: "",
     dni: 0,
     telefono: 0,
-    direccion: 0,
+    direccion: "",
     observaciones: "",
   });
 
@@ -36,7 +35,7 @@ export function ClientModal({
         apellido: cliente.apellido || "",
         dni: cliente.dni || 0,
         telefono: cliente.telefono || 0,
-        direccion: cliente.direccion || 0,
+        direccion: cliente.direccion || "",
         observaciones: cliente.observaciones || "",
       });
     } else {
@@ -45,7 +44,7 @@ export function ClientModal({
         apellido: "",
         dni: 0,
         telefono: 0,
-        direccion: 0,
+        direccion: "",
         observaciones: "",
       });
     }
@@ -160,12 +159,14 @@ export function ClientModal({
 
           <div>
             <label className="text-sm font-medium">Direccion</label>
+
             <Input
-              type="number"
               name="direccion"
               placeholder="Ingrese la dirección del cliente"
-              value={form.direccion === 0 ? "" : form.direccion}
-              onChange={handleChange}
+              value={form.direccion === "" ? "" : form.direccion}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, direccion: e.target.value }))
+              }
             />
           </div>
 

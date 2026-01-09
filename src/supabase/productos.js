@@ -21,7 +21,6 @@ export async function getProductos(search = "", page = 1, pageSize = 10) {
 
 // 🔹 Crear un producto
 export async function createProducto(producto) {
-  console.log("Creando producto:", producto);
   const {
     nombre,
     precio_contado,

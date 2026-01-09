@@ -5,13 +5,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { getComprasCliente } from "@/supabase/clientes";
 import { DetalleCompraModal } from "./DetalleCompraModal";
 
@@ -26,7 +19,6 @@ export function ComprasClienteModal({ abierto, onCerrar, cliente }) {
     if (!abierto || !cliente) return;
 
     async function fetchCompras() {
-      console.log(cliente.id);
       setLoading(true);
       try {
         const data = await getComprasCliente(cliente.id);

@@ -147,7 +147,7 @@ export function Clientes() {
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Buscar por nombre o DNI..."
+                placeholder="Buscar por nombre o apellido..."
                 className="pl-9 w-full border rounded-md p-2 text-sm"
               />
             </div>

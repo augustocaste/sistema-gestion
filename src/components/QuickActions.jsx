@@ -49,7 +49,7 @@ export function QuickActions() {
       },
     },
     {
-      title: "Registrar Pago",
+      title: "Registrar Compra",
       icon: FileText,
       onClick: () => {
         console.log("Registrar pago");
