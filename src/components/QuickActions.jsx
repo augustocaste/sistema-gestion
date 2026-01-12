@@ -11,11 +11,14 @@ import { ProductModal } from "./modals/ProductModal";
 import { createProducto } from "../supabase/productos";
 import { ClientModal } from "./modals/ClientModal";
 import { createCliente } from "../supabase/clientes";
+import { EmpleadoModal } from "./modals/EmpleadoModal";
+import { createEmpleado } from "@/supabase/trabajadores";
 
 export function QuickActions() {
   const [modalAbiertoProducto, setModalAbiertoProducto] = useState(false);
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [modoModalProducto, setModoModalProducto] = useState("crear");
+  const [modalAbiertoEmpleado, setModalAbiertoEmpleado] = useState(false);
 
   const [modalAbiertoCliente, setModalAbiertoCliente] = useState(false);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
@@ -31,6 +34,10 @@ export function QuickActions() {
     setProductoSeleccionado(null);
     setModoModalProducto("crear");
     setModalAbiertoProducto(true);
+  }
+
+  function abrirModalCrearEmpleado() {
+    setModalAbiertoEmpleado(true);
   }
 
   const actions = [
@@ -59,7 +66,7 @@ export function QuickActions() {
       title: "Nuevo Trabajador",
       icon: Plus,
       onClick: () => {
-        console.log("Crear trabajador");
+        abrirModalCrearEmpleado();
       },
     },
   ];
@@ -79,6 +86,16 @@ export function QuickActions() {
       const { error } = await createCliente(formData);
       setModalAbiertoCliente(false);
       return { ok: true };
+    } catch (error) {
+      return { ok: false, error };
+    }
+  }
+
+  async function onGuardarTrabajador(form) {
+    try {
+      const res = await createEmpleado(form);
+      setModalAbiertoEmpleado(false);
+      return res;
     } catch (error) {
       return { ok: false, error };
     }
@@ -119,6 +136,11 @@ export function QuickActions() {
         cliente={clienteSeleccionado}
         modo={modoModalCliente}
         onGuardar={handleGuardarCliente}
+      />
+      <EmpleadoModal
+        abierto={modalAbiertoEmpleado}
+        onCerrar={() => setModalAbiertoEmpleado(false)}
+        onGuardar={onGuardarTrabajador}
       />
     </Card>
   );

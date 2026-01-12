@@ -23,7 +23,6 @@ import {
 import { PlanPagosModal } from "@/components/modals/PlanPagosModal.jsx";
 
 export function DetalleCompraModal({ abierto, onCerrar, compra }) {
-  const [planSeleccionado, setPlanSeleccionado] = useState(null);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [planTotal, setPlanTotal] = useState(null);
 

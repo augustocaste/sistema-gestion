@@ -9,6 +9,7 @@ import {
   CreditCard,
   Settings,
   X,
+  Receipt,
 } from "lucide-react";
 
 const navigation = [
@@ -16,7 +17,7 @@ const navigation = [
   { name: "Productos", href: "/productos", icon: Package },
   { name: "Clientes", href: "/clientes", icon: Users },
   { name: "Trabajadores", href: "/trabajadores", icon: UserCircle },
-  // { name: "Compras", href: "/configuracion", icon: Settings },
+  { name: "Compras", href: "/configuracion", icon: Receipt },
   { name: "Pagos", href: "/pagos", icon: CreditCard },
 ];
 
@@ -90,7 +91,6 @@ export function Sidebar() {
         </div>
       </aside>
 
-      {/* Mobile Trigger Button */}
       <button
         onClick={() => setOpen(!open)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-card border border-border rounded-md"

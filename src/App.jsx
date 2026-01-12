@@ -5,6 +5,8 @@ import { Productos } from "./pages/Productos";
 import { Clientes } from "./pages/Clientes";
 import { Pagos } from "./pages/Pagos";
 import { Toaster } from "sonner";
+import { ProtectedRoute } from "@/middleware/ProtectedRoute";
+import { Login } from "./pages/Login";
 // Si creas más páginas, impórtalas aquí
 // import Productos from "./pages/Productos";
 
@@ -13,12 +15,15 @@ function App() {
     <BrowserRouter>
       <Toaster richColors position="top-right" />
       <Routes>
-        {/* La ruta principal "/" carga tu Dashboard */}
-        <Route path="/" element={<Home />} />
-
-        {/* Puedes crear rutas temporales para que no tire error 
-           al hacer clic en el Sidebar 
-        */}
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/productos" element={<Productos />} />
         <Route path="/clientes" element={<Clientes />} />
         <Route path="/trabajadores" element={<Trabajadores />} />
