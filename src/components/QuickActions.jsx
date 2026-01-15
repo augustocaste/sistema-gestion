@@ -13,6 +13,8 @@ import { ClientModal } from "./modals/ClientModal";
 import { createCliente } from "../supabase/clientes";
 import { EmpleadoModal } from "./modals/EmpleadoModal";
 import { createEmpleado } from "@/supabase/trabajadores";
+import { RegistrarCompraModal } from "@/components/modals/RegistrarCompraModal";
+import { getEmpleados } from "@/supabase/empleados";
 
 export function QuickActions() {
   const [modalAbiertoProducto, setModalAbiertoProducto] = useState(false);
@@ -23,6 +25,9 @@ export function QuickActions() {
   const [modalAbiertoCliente, setModalAbiertoCliente] = useState(false);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
   const [modoModalCliente, setModoModalCliente] = useState("crear");
+
+  const [modalAbiertoRegistrarCompra, setModalAbiertoRegistrarCompra] =
+    useState(false);
 
   function abrirModalCrearCliente() {
     setClienteSeleccionado(null);
@@ -38,6 +43,10 @@ export function QuickActions() {
 
   function abrirModalCrearEmpleado() {
     setModalAbiertoEmpleado(true);
+  }
+
+  function abrirModalRegistrarCompra() {
+    setModalAbiertoRegistrarCompra(true);
   }
 
   const actions = [
@@ -59,7 +68,7 @@ export function QuickActions() {
       title: "Registrar Compra",
       icon: FileText,
       onClick: () => {
-        console.log("Registrar pago");
+        abrirModalRegistrarCompra();
       },
     },
     {
@@ -141,6 +150,10 @@ export function QuickActions() {
         abierto={modalAbiertoEmpleado}
         onCerrar={() => setModalAbiertoEmpleado(false)}
         onGuardar={onGuardarTrabajador}
+      />
+      <RegistrarCompraModal
+        open={modalAbiertoRegistrarCompra}
+        onClose={() => setModalAbiertoRegistrarCompra(false)}
       />
     </Card>
   );

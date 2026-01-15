@@ -7,8 +7,7 @@ import { Pagos } from "./pages/Pagos";
 import { Toaster } from "sonner";
 import { ProtectedRoute } from "@/middleware/ProtectedRoute";
 import { Login } from "./pages/Login";
-// Si creas más páginas, impórtalas aquí
-// import Productos from "./pages/Productos";
+import { Cuotas } from "./pages/Cuotas";
 
 function App() {
   return (
@@ -27,7 +26,7 @@ function App() {
         <Route path="/productos" element={<Productos />} />
         <Route path="/clientes" element={<Clientes />} />
         <Route path="/trabajadores" element={<Trabajadores />} />
-        <Route path="/pagos" element={<Pagos />} />
+        <Route path="/cuotas" element={<Cuotas />} />
         <Route
           path="/configuracion"
           element={<div className="p-8">Configuración</div>}

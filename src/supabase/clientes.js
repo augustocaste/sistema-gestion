@@ -19,6 +19,12 @@ export async function getClientes(search = "", page = 1, pageSize = 10) {
   return { data, total: count };
 }
 
+export async function buscarClientes(texto) {
+  let query = supabase.from("cliente").select("id, nombre, apellido").limit(5);
+  query = query.or(`nombre.ilike.%${texto}%,apellido.ilike.%${texto}%`);
+  return await query;
+}
+
 // 🔹 Crear un cliente
 export async function createCliente(cliente) {
   const { nombre, apellido, dni, telefono, direccion, observaciones } = cliente;
@@ -115,12 +121,21 @@ export async function getCuotasVencidas() {
               nombre,
               apellido
             )
-          )
+          ),
+          producto (
+            id,
+            nombre
+          )  
         )
       )
     `
     )
-    .eq("fecha_vencimiento", new Date().toISOString())
+    .eq(
+      "fecha_vencimiento",
+      new Date().toLocaleDateString("sv-SE", {
+        timeZone: "America/Argentina/Buenos_Aires",
+      })
+    )
     .eq("estado", "pendiente")
     .order("fecha_vencimiento", { ascending: true });
 
@@ -166,4 +181,82 @@ export async function obtenerPlanCuotasPorProducto(compraProductoId) {
   if (error) throw error;
 
   return data.plan_cuotas;
+}
+
+async function buscarClientesIds(search) {
+  const { data, error } = await supabase
+    .from("cliente")
+    .select("id")
+    .or(`nombre.ilike.%${search}%,apellido.ilike.%${search}%`);
+
+  if (error) throw error;
+
+  return data.map((c) => c.id);
+}
+
+export async function getCuotas({ estado, search, page = 1, pageSize = 10 }) {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let clientesIds = [];
+
+  if (search) {
+    clientesIds = await buscarClientesIds(search);
+
+    if (clientesIds.length === 0) {
+      return { data: [], total: 0 };
+    }
+  }
+
+  let query = supabase
+    .from("cuota")
+    .select(
+      `
+      id,
+      nro_cuota,
+      fecha_vencimiento,
+      estado,
+      monto_actual_pagado,
+      plan_cuotas!inner (
+        id,
+        cant_cuotas,
+        monto_cuota,
+        compra_producto!inner (
+          id,
+          compra!inner (
+            id,
+            cliente!inner (
+              id,
+              nombre,
+              apellido
+            )
+          ),
+          producto (
+            id,
+            nombre
+          )
+        )
+      )
+      `,
+      { count: "exact" }
+    )
+    .eq("estado", estado)
+    .order("fecha_vencimiento", { ascending: true })
+    .range(from, to);
+
+  // 🔹 FILTRO REAL (ESTA ES LA CLAVE)
+  if (clientesIds.length > 0) {
+    query = query.in(
+      "plan_cuotas.compra_producto.compra.cliente.id",
+      clientesIds
+    );
+  }
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  return {
+    data,
+    total: count,
+  };
 }

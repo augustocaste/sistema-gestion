@@ -53,8 +53,9 @@ export function RecentActivity() {
           </p>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-4 max-h-[320px] overflow-y-auto pr-1">
           {cuotas.map((cuota) => {
+            console.log(cuota);
             const compraProducto = cuota.plan_cuotas?.compra_producto?.[0];
 
             const cliente =
@@ -68,6 +69,8 @@ export function RecentActivity() {
               ? `${cliente.nombre?.[0] ?? ""}${cliente.apellido?.[0] ?? ""}`
               : "--";
 
+            const mensaje = `tiene una cuota vencida en el pago de ${compraProducto.producto.nombre}`;
+
             return (
               <div key={cuota.id} className="flex items-start gap-3">
                 <Avatar className="w-9 h-9">
@@ -79,9 +82,7 @@ export function RecentActivity() {
                 <div className="flex-1 space-y-1">
                   <p className="text-sm">
                     <span className="font-medium">{nombreCompleto}</span>{" "}
-                    <span className="text-muted-foreground">
-                      tiene una cuota vencida
-                    </span>
+                    <span className="text-muted-foreground">{mensaje}</span>
                   </p>
 
                   <div className="flex items-center justify-between gap-2">

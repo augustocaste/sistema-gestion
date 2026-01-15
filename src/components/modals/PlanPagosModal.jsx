@@ -12,7 +12,7 @@ import { RegistrarPagoModal } from "@/components/modals/RegistrarPagoModal";
 
 export function PlanPagosModal({ abierto, onCerrar, plan }) {
   if (!plan) return null;
-
+  console.log(plan);
   const [cuotas, setCuotas] = useState([]);
 
   const [cuotaSeleccionada, setCuotaSeleccionada] = useState(null);

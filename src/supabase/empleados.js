@@ -18,3 +18,13 @@ export async function getEmpleados(search = "", page = 1, pageSize = 10) {
   if (error) throw error;
   return { data, total: count };
 }
+
+export async function buscarEmpleados(texto) {
+  let query = supabase
+    .from("empleados")
+    .select("id, nombre, apellido")
+    .limit(5);
+  query = query.or(`nombre.ilike.%${texto}%,apellido.ilike.%${texto}%`);
+
+  return await query;
+}

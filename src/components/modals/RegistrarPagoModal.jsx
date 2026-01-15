@@ -7,17 +7,17 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { useEffect, useState } from "react";
 // import { getTrabajadores } from "@/supabase/trabajadores";
 import { toast } from "sonner";
-import { updateCuota } from "@/supabase/pagos";
+import { updateCuota, verificarYCompletarPlan } from "@/supabase/pagos";
 
 export function RegistrarPagoModal({ abierto, onCerrar, cuota, tipo, plan }) {
   const [trabajadores, setTrabajadores] = useState([]);
@@ -85,6 +85,7 @@ export function RegistrarPagoModal({ abierto, onCerrar, cuota, tipo, plan }) {
       toast.success("Pago exitoso");
 
       onCerrar();
+      await verificarYCompletarPlan(plan.id);
     } catch (error) {
       console.error(error);
       toast.error("Error inesperado al realizar el pago");
