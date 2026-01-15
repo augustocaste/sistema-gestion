@@ -8,6 +8,7 @@ import { Toaster } from "sonner";
 import { ProtectedRoute } from "@/middleware/ProtectedRoute";
 import { Login } from "./pages/Login";
 import { Cuotas } from "./pages/Cuotas";
+import { Transferencias } from "./pages/Transferencias";
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           path="/configuracion"
           element={<div className="p-8">Configuración</div>}
         />
+        <Route path="/transferencias" element={<Transferencias />} />
       </Routes>
     </BrowserRouter>
   );

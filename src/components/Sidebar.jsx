@@ -16,9 +16,8 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Productos", href: "/productos", icon: Package },
   { name: "Clientes", href: "/clientes", icon: Users },
-  // { name: "Trabajadores", href: "/trabajadores", icon: UserCircle },
-  // { name: "Compras", href: "/configuracion", icon: Receipt },
   { name: "Cuotas", href: "/cuotas", icon: CreditCard },
+  { name: "Ingresos", href: "/transferencias", icon: Receipt },
 ];
 
 export function Sidebar() {

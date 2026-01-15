@@ -7,24 +7,15 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
 import { useEffect, useState } from "react";
-// import { getTrabajadores } from "@/supabase/trabajadores";
 import { toast } from "sonner";
 import { updateCuota, verificarYCompletarPlan } from "@/supabase/pagos";
 
 export function RegistrarPagoModal({ abierto, onCerrar, cuota, tipo, plan }) {
-  const [trabajadores, setTrabajadores] = useState([]);
   const deuda = (plan?.monto_cuota ?? 0) - (cuota?.monto_actual_pagado ?? 0);
 
   const [form, setForm] = useState({
-    // trabajador: "",
+    metodo: "transferencia", // transferencia | efectivo
     alias: "",
     monto: "",
     fecha: "",
@@ -43,12 +34,14 @@ export function RegistrarPagoModal({ abierto, onCerrar, cuota, tipo, plan }) {
     }
   }, [tipo, cuota, plan]);
 
-  // useEffect(() => {
-  //   if (!abierto) return;
-  //   getTrabajadores().then(setTrabajadores);
-  // }, [abierto]);
-
   if (!cuota) return null;
+  function handleMetodoChange(metodo) {
+    setForm((p) => ({
+      ...p,
+      metodo,
+      alias: metodo === "efectivo" ? "" : p.alias,
+    }));
+  }
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -60,12 +53,16 @@ export function RegistrarPagoModal({ abierto, onCerrar, cuota, tipo, plan }) {
       : form.monto;
 
   async function handleGuardarClick() {
-    // if (!form.trabajador || !form.alias || !form.monto || !form.fecha) {
-    if (!form.alias || !form.monto || !form.fecha) {
-      console.log("form incompleto:", form);
+    if (!form.monto || !form.fecha) {
       toast.error("Por favor complete todos los campos");
       return;
     }
+
+    if (form.metodo === "transferencia" && !form.alias) {
+      toast.error("Debe ingresar un alias para transferencias");
+      return;
+    }
+
     if (form.monto > deuda) {
       toast.error(
         "El monto del adelanto no puede exceder el monto restante de la cuota que es " +
@@ -83,7 +80,6 @@ export function RegistrarPagoModal({ abierto, onCerrar, cuota, tipo, plan }) {
       }
 
       toast.success("Pago exitoso");
-
       onCerrar();
       await verificarYCompletarPlan(plan.id);
     } catch (error) {
@@ -102,31 +98,50 @@ export function RegistrarPagoModal({ abierto, onCerrar, cuota, tipo, plan }) {
               : `Pagar cuota #${cuota.nro_cuota}`}
           </DialogTitle>
         </DialogHeader>
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Método de pago</label>
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={form.metodo === "transferencia" ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleMetodoChange("transferencia")}
+            >
+              Transferencia
+            </Button>
+
+            <Button
+              type="button"
+              variant={form.metodo === "efectivo" ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleMetodoChange("efectivo")}
+            >
+              Efectivo
+            </Button>
+          </div>
+        </div>
 
         <div className="space-y-4 text-sm">
-          {/* Trabajador */}
-          {/* <div>
-            <label className="text-sm font-medium">Trabajador</label>
-            <Select
-              onValueChange={(v) => setForm((p) => ({ ...p, trabajador: v }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Seleccione trabajador" />
-              </SelectTrigger>
-              <SelectContent>
-                {trabajadores.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    {t.nombre} {t.apellido}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div> */}
-
           {/* Alias */}
           <div>
             <label className="text-sm font-medium">Alias destino</label>
-            <Input name="alias" value={form.alias} onChange={handleChange} />
+            <Input
+              name="alias"
+              value={form.alias}
+              onChange={handleChange}
+              disabled={form.metodo === "efectivo"}
+              placeholder={
+                form.metodo === "efectivo"
+                  ? "Pago en efectivo"
+                  : "Alias de transferencia"
+              }
+              className={
+                form.metodo === "efectivo"
+                  ? "opacity-60 cursor-not-allowed"
+                  : ""
+              }
+            />
           </div>
 
           {/* Monto */}
