@@ -3,13 +3,11 @@ import { Home } from "./pages/Home";
 import { Trabajadores } from "./pages/Trabajadores";
 import { Productos } from "./pages/Productos";
 import { Clientes } from "./pages/Clientes";
-import { Pagos } from "./pages/Pagos";
 import { Toaster } from "sonner";
 import { ProtectedRoute } from "@/middleware/ProtectedRoute";
 import { Login } from "./pages/Login";
 import { Cuotas } from "./pages/Cuotas";
 import { Transferencias } from "./pages/Transferencias";
-import { Factura } from "./components/factura";
 
 function App() {
   return (
