@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/middleware/ProtectedRoute";
 import { Login } from "./pages/Login";
 import { Cuotas } from "./pages/Cuotas";
 import { Transferencias } from "./pages/Transferencias";
+import { Factura } from "./components/factura";
 
 function App() {
   return (
@@ -24,15 +25,47 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/productos" element={<Productos />} />
-        <Route path="/clientes" element={<Clientes />} />
-        <Route path="/trabajadores" element={<Trabajadores />} />
-        <Route path="/cuotas" element={<Cuotas />} />
         <Route
-          path="/configuracion"
-          element={<div className="p-8">Configuración</div>}
+          path="/productos"
+          element={
+            <ProtectedRoute>
+              <Productos />
+            </ProtectedRoute>
+          }
         />
-        <Route path="/transferencias" element={<Transferencias />} />
+        <Route
+          path="/clientes"
+          element={
+            <ProtectedRoute>
+              <Clientes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/trabajadores"
+          element={
+            <ProtectedRoute>
+              <Trabajadores />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cuotas"
+          element={
+            <ProtectedRoute>
+              <Cuotas />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/transferencias"
+          element={
+            <ProtectedRoute>
+              <Transferencias />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

@@ -21,6 +21,7 @@ import { buscarEmpleados } from "@/supabase/empleados";
 import { buscarClientes, createCliente } from "@/supabase/clientes";
 import { toast } from "sonner";
 import { ClientModal } from "./ClientModal";
+import { FacturaModal } from "@/components/modals/FacturaModal";
 
 export function RegistrarCompraModal({ open, onClose }) {
   //, empleados }) {
@@ -43,6 +44,10 @@ export function RegistrarCompraModal({ open, onClose }) {
   const [modoModalCliente, setModoModalCliente] = useState("crear");
 
   const [loading, setLoading] = useState(true);
+
+  const [mostrarFactura, setMostrarFactura] = useState(false);
+  const [compraIdFactura, setCompraIdFactura] = useState(null);
+
   const montoTotal = seleccionados.reduce((acc, p) => acc + p.monto, 0);
 
   function calcularMonto(producto, cuotas) {
@@ -70,7 +75,7 @@ export function RegistrarCompraModal({ open, onClose }) {
     }
 
     buscarEmpleados(searchEmpleado).then(({ data }) =>
-      setEmpleados(data ?? [])
+      setEmpleados(data ?? []),
     );
   }, [searchEmpleado]);
   useEffect(() => {
@@ -149,25 +154,32 @@ export function RegistrarCompraModal({ open, onClose }) {
   }
 
   async function guardarCompra() {
-    // if (!fecha || !empleadoId || seleccionados.length === 0) {
     if (!fecha || seleccionados.length === 0) {
       return toast.error("Faltan datos obligatorios");
     }
 
     setLoading(false);
 
-    const { ok, message } = await registrarCompra(
+    const { ok, message, compraId } = await registrarCompra(
       fecha,
       empleadoSeleccionado?.id,
       montoTotal,
       seleccionados,
-      clienteSeleccionado?.id ?? null
+      clienteSeleccionado?.id ?? null,
     );
-    console.log(ok, message);
-    !ok ? toast.error(message) : toast.success(message);
 
     setLoading(true);
-    onClose();
+
+    if (!ok) {
+      toast.error(message);
+      return;
+    }
+
+    toast.success(message);
+
+    // 🔥 ABRIR FACTURA
+    setCompraIdFactura(compraId);
+    setMostrarFactura(true);
   }
 
   return (
@@ -410,6 +422,14 @@ export function RegistrarCompraModal({ open, onClose }) {
         cliente={cliente}
         modo={modoModalCliente}
         onGuardar={handleGuardarCliente}
+      />
+      <FacturaModal
+        open={mostrarFactura}
+        compraId={compraIdFactura}
+        onClose={() => {
+          setMostrarFactura(false);
+          onClose(); // recién acá cerrás todo
+        }}
       />
     </Dialog>
   );

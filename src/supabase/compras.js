@@ -18,7 +18,7 @@ export async function registrarCompra(
   empleado_id,
   montoTotal,
   seleccionados,
-  cliente_id
+  cliente_id,
 ) {
   console.log("INFORMACION QUE LLEGA A REGISTRAR COMPRA:");
   console.log("fecha:", fecha);
@@ -48,12 +48,6 @@ export async function registrarCompra(
     }
   }
 
-  console.log(
-    "compra a insertar " + fecha,
-    empleado_id,
-    cliente_id,
-    montoTotal
-  );
   /* ===============================
      2. CREAR COMPRA
   =============================== */
@@ -81,7 +75,7 @@ export async function registrarCompra(
     if (p.tipo_pago === "cuotas" && p.cuotas > 1) {
       const montoCuota = Math.round(p.monto / p.cuotas);
       console.log(
-        "plan de cuotas a crear: " + p.cuotas + " cuotas de " + montoCuota
+        "plan de cuotas a crear: " + p.cuotas + " cuotas de " + montoCuota,
       );
       // 3.1 Crear plan de cuotas
       const { data: plan, error: errorPlan } = await supabase
@@ -103,7 +97,7 @@ export async function registrarCompra(
         console.log(
           "cuota a crear: nro " + plan.id,
           i,
-          sumarDias(fecha, i * 30)
+          sumarDias(fecha, i * 30),
         );
         const { data: cuota, error: errorCuota } = await supabase
           .from("cuota")
@@ -147,7 +141,7 @@ export async function registrarCompra(
       p.monto,
       p.tipo_pago,
       p.medio_pago,
-      planCuotasId
+      planCuotasId,
     );
     const { data: compra_producto, error: errorCompraProducto } = await supabase
       .from("compra_producto")
@@ -177,5 +171,47 @@ export async function registrarCompra(
       return { ok: false, message: "Error al actualizar stock del producto" };
   }
 
-  return { ok: true, message: "Compra registrada con éxito" };
+  return { ok: true, message: "Compra registrada con éxito", compraId };
+}
+
+export async function getFacturasByCompra(compraId) {
+  const { data, error } = await supabase
+    .from("compra_producto")
+    .select(
+      `
+      id,
+      monto,
+      medio_pago,
+      estado_pago,
+      id_compra,
+      producto (
+        nombre
+      ),
+
+      compra (
+        fecha,
+        cliente: id_cliente (
+          nombre,
+          apellido
+        )
+      ),
+
+      plan_cuotas (
+        cant_cuotas,
+        monto_cuota,
+        cuota (
+          nro_cuota,
+          fecha_vencimiento,
+          estado,
+          monto_actual_pagado
+        )
+      )
+    `,
+    )
+    .eq("id_compra", compraId)
+    .order("id", { ascending: true });
+  console.log("la query da " + JSON.stringify(data));
+  if (error) throw error;
+
+  return data;
 }
