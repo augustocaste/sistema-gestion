@@ -20,12 +20,6 @@ export async function registrarCompra(
   seleccionados,
   cliente_id,
 ) {
-  console.log("INFORMACION QUE LLEGA A REGISTRAR COMPRA:");
-  console.log("fecha:", fecha);
-  console.log("empleado_id:", empleado_id);
-  console.log("montoTotal:", montoTotal);
-  console.log("cliente_id:", cliente_id);
-  console.log("seleccionados:", seleccionados);
   /* ===============================
      1. VALIDAR STOCK
   =============================== */
@@ -74,9 +68,7 @@ export async function registrarCompra(
     // 🔹 SI ES EN CUOTAS
     if (p.tipo_pago === "cuotas" && p.cuotas > 1) {
       const montoCuota = Math.round(p.monto / p.cuotas);
-      console.log(
-        "plan de cuotas a crear: " + p.cuotas + " cuotas de " + montoCuota,
-      );
+
       // 3.1 Crear plan de cuotas
       const { data: plan, error: errorPlan } = await supabase
         .from("plan_cuotas")

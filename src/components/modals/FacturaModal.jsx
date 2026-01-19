@@ -17,13 +17,7 @@ export function FacturaModal({ open, compraId, onClose }) {
 
     async function cargarFacturas() {
       setLoading(true);
-
-      console.log("El id de la compra es:", compraId);
-
       const result = await getFacturasByCompra(compraId);
-
-      console.log("RESULTADO COMPLETO:", result);
-
       setFacturas(result ?? []);
       setLoading(false);
     }
@@ -33,9 +27,20 @@ export function FacturaModal({ open, compraId, onClose }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className="
+          w-[95vw]
+          max-w-5xl
+          max-h-[95vh]
+          overflow-y-auto
+          p-4
+          sm:p-6
+        "
+      >
         <DialogHeader>
-          <DialogTitle>Facturas de la compra</DialogTitle>
+          <DialogTitle className="text-base sm:text-lg">
+            Facturas de la compra
+          </DialogTitle>
         </DialogHeader>
 
         {loading ? (

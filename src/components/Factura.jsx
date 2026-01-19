@@ -24,15 +24,8 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
     <div
       ref={ref}
       className="max-w-[210mm] mx-auto bg-white shadow-lg print:shadow-none"
+      style={{ pageBreakAfter: "always" }}
     >
-      {/* ACCIONES */}
-      <div className="p-4 print:hidden flex justify-end">
-        <Button onClick={onPrint} variant="outline" className="gap-2">
-          <Printer className="w-4 h-4" />
-          Imprimir
-        </Button>
-      </div>
-
       <div className="p-8 pt-2">
         {/* HEADER */}
         <div className="flex justify-between items-start mb-8">
