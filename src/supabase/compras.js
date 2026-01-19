@@ -2,7 +2,7 @@ import { supabase } from "./client";
 
 function agruparProductos(seleccionados) {
   return seleccionados.reduce((acc, p) => {
-    acc[p.id] = (acc[p.id] || 0) + 1;
+    acc[p.id] = (acc[p.id] || 0) + p.cantidad;
     return acc;
   }, {});
 }
@@ -31,7 +31,7 @@ export async function registrarCompra(
     .select("id, stock, nombre")
     .in("id", idsProductos);
 
-  if (errorStock) throw errorStock;
+  if (errorStock) return { ok: false, message: "Error al validar stock" };
 
   for (const prod of productos) {
     if (prod.stock < cantidades[prod.id]) {
@@ -55,21 +55,21 @@ export async function registrarCompra(
     })
     .select()
     .single();
+
+  if (errorCompra) return { ok: false, message: "Error al crear la compra" };
+
   const compraId = compra.id;
-  if (errorCompra)
-    return { ok: false, message: "Hubo un error al guardar la compra" };
 
   /* ===============================
-     3. PRODUCTOS + CUOTAS
+     3. PRODUCTOS + PLANES DE PAGO
   =============================== */
   for (const p of seleccionados) {
     let planCuotasId = null;
 
-    // 🔹 SI ES EN CUOTAS
+    /* ---------- PLAN DE CUOTAS ---------- */
     if (p.tipo_pago === "cuotas" && p.cuotas > 1) {
       const montoCuota = Math.round(p.monto / p.cuotas);
 
-      // 3.1 Crear plan de cuotas
       const { data: plan, error: errorPlan } = await supabase
         .from("plan_cuotas")
         .insert({
@@ -84,26 +84,21 @@ export async function registrarCompra(
 
       planCuotasId = plan.id;
 
-      // 3.2 Crear cuotas
       for (let i = 1; i <= p.cuotas; i++) {
-        console.log(
-          "cuota a crear: nro " + plan.id,
-          i,
-          sumarDias(fecha, i * 30),
-        );
-        const { data: cuota, error: errorCuota } = await supabase
-          .from("cuota")
-          .insert({
-            id_plan_cuotas: plan.id,
-            nro_cuota: i,
-            fecha_vencimiento: sumarDias(fecha, i * 30),
-            estado: "pendiente",
-            monto_actual_pagado: 0,
-          });
+        const { error: errorCuota } = await supabase.from("cuota").insert({
+          id_plan_cuotas: plan.id,
+          nro_cuota: i,
+          fecha_vencimiento: sumarDias(fecha, i * 30),
+          estado: "pendiente",
+          monto_actual_pagado: 0,
+        });
 
-        if (errorCuota) return { ok: false, message: "Error al crear cuota" };
+        if (errorCuota) return { ok: false, message: "Error al crear cuotas" };
       }
-    } else if (p.tipo_pago == "contado") {
+    }
+
+    /* ---------- CONTADO ---------- */
+    if (p.tipo_pago === "contado") {
       const { data: plan, error: errorPlan } = await supabase
         .from("plan_cuotas")
         .insert({
@@ -113,57 +108,57 @@ export async function registrarCompra(
         .select()
         .single();
 
-      const { data: cuota, error: errorCuota } = await supabase
-        .from("cuota")
-        .insert({
-          id_plan_cuotas: plan.id,
-          nro_cuota: 1,
-          fecha_vencimiento: fecha,
-          estado: "pagada",
-          monto_actual_pagado: p.monto,
-        });
-      planCuotasId = plan.id;
-    }
+      if (errorPlan)
+        return { ok: false, message: "Error al crear pago contado" };
 
-    // 3.3 Insertar compra_producto
-    console.log(
-      "compra_producto a insertar: ",
-      compraId,
-      p.id,
-      p.monto,
-      p.tipo_pago,
-      p.medio_pago,
-      planCuotasId,
-    );
-    const { data: compra_producto, error: errorCompraProducto } = await supabase
+      planCuotasId = plan.id;
+
+      const { error: errorCuota } = await supabase.from("cuota").insert({
+        id_plan_cuotas: plan.id,
+        nro_cuota: 1,
+        fecha_vencimiento: fecha,
+        estado: "pagada",
+        monto_actual_pagado: p.monto,
+      });
+
+      if (errorCuota)
+        return { ok: false, message: "Error al registrar pago contado" };
+    }
+    /* ---------- COMPRA_PRODUCTO ---------- */
+    const { error: errorCompraProducto } = await supabase
       .from("compra_producto")
       .insert({
         id_compra: compraId,
         id_producto: p.id,
+        cantidad: p.cantidad,
         monto: p.monto,
-        estado_pago: p.tipo_pago === "contado" ? "Completado" : "No completado",
         medio_pago: p.tipo_pago,
+        estado_pago: p.tipo_pago === "contado" ? "Completado" : "No completado",
         id_plan_cuotas: planCuotasId,
       });
 
     if (errorCompraProducto)
       return { ok: false, message: "Error al crear compra_producto" };
 
-    // 3.4 Descontar stock
-    const prod = productos.find((pr) => pr.id === p.id);
+    /* ---------- DESCONTAR STOCK ---------- */
+    const prod = productos.find((x) => x.id === p.id);
 
-    const { data: stock, error: errorStock } = await supabase
+    const { error: errorUpdateStock } = await supabase
       .from("producto")
       .update({
-        stock: prod.stock - cantidades[p.id],
+        stock: prod.stock - p.cantidad,
       })
       .eq("id", p.id);
 
-    if (errorStock)
-      return { ok: false, message: "Error al actualizar stock del producto" };
+    if (errorUpdateStock)
+      return { ok: false, message: "Error al actualizar stock" };
   }
 
-  return { ok: true, message: "Compra registrada con éxito", compraId };
+  return {
+    ok: true,
+    message: "Compra registrada con éxito",
+    compraId,
+  };
 }
 
 export async function getFacturasByCompra(compraId) {
@@ -176,6 +171,7 @@ export async function getFacturasByCompra(compraId) {
       medio_pago,
       estado_pago,
       id_compra,
+      cantidad,
       producto (
         nombre
       ),

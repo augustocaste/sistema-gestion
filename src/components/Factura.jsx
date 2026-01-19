@@ -19,6 +19,8 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
 
   const fechaFactura = compra?.fecha ?? "";
   const total = factura.monto;
+  const cantidad = factura.cantidad ?? 1;
+  const precioUnitario = total / cantidad;
 
   return (
     <div
@@ -94,13 +96,21 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
           </thead>
           <tbody>
             <tr>
-              <td className="border-2 px-2 py-1">{producto?.nombre}</td>
+              <td className="border-2 px-2 py-1">
+                {producto?.nombre}
+                {cantidad > 1 && (
+                  <span className="text-sm text-gray-600"> × {cantidad}</span>
+                )}
+              </td>
+
               <td className="border-2 px-2 py-1 text-center">
                 {esCuotas ? `${cuotas.length} cuotas` : "Contado"}
               </td>
+
               <td className="border-2 px-2 py-1 text-center">
-                $ {total.toLocaleString("es-AR")}
+                $ {precioUnitario.toLocaleString("es-AR")}
               </td>
+
               <td className="border-2 px-2 py-1 text-center font-bold">
                 $ {total.toLocaleString("es-AR")}
               </td>
