@@ -25,7 +25,7 @@ import { PlanPagosModal } from "@/components/modals/PlanPagosModal.jsx";
 export function DetalleCompraModal({ abierto, onCerrar, compra }) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [planTotal, setPlanTotal] = useState(null);
-
+  console.log(compra);
   if (!compra) return null;
 
   async function handleClick(compraProducto) {
@@ -81,6 +81,7 @@ export function DetalleCompraModal({ abierto, onCerrar, compra }) {
                   <TableRow>
                     <TableHead>Producto</TableHead>
                     <TableHead className="text-right">Monto</TableHead>
+                    <TableHead className="text-right">Cantidad</TableHead>
                     <TableHead className="text-right">Estado de pago</TableHead>
                     <TableHead className="text-right">Acción</TableHead>
                   </TableRow>
@@ -92,7 +93,7 @@ export function DetalleCompraModal({ abierto, onCerrar, compra }) {
                       <TableCell>{p.producto.nombre}</TableCell>
 
                       <TableCell className="text-right">${p.monto}</TableCell>
-
+                      <TableCell className="text-right">{p.cantidad}</TableCell>
                       <TableCell className="text-right">
                         <Badge variant="outline">{p.estado_pago}</Badge>
                       </TableCell>

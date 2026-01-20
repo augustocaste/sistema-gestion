@@ -51,21 +51,29 @@ export function RegistrarCompraModal({ open, onClose }) {
   const montoTotal = seleccionados.reduce((acc, p) => acc + p.monto, 0);
 
   function calcularMonto(producto, cuotas) {
-    console.log(producto, cuotas);
+    let unitario;
+
     switch (cuotas) {
       case 1:
-        return producto.precio_contado;
+        unitario = producto.precio_contado;
+        break;
       case 3:
-        return producto.tres_cuotas;
+        unitario = producto.tres_cuotas;
+        break;
       case 6:
-        return producto.seis_cuotas;
+        unitario = producto.seis_cuotas;
+        break;
       case 9:
-        return producto.nueve_cuotas;
+        unitario = producto.nueve_cuotas;
+        break;
       case 12:
-        return producto.doce_cuotas;
+        unitario = producto.doce_cuotas;
+        break;
       default:
-        return producto.precio_contado;
+        unitario = producto.precio_contado;
     }
+
+    return unitario;
   }
 
   useEffect(() => {
@@ -129,27 +137,58 @@ export function RegistrarCompraModal({ open, onClose }) {
   }
 
   function agregarProducto(producto) {
-    if (producto.stock <= 0) return alert("Producto sin stock");
+    setSeleccionados((prev) => {
+      const existente = prev.find((p) => p.id === producto.id);
 
-    setSeleccionados((prev) => [
-      ...prev,
-      {
-        ...producto,
-        tipo_pago: "contado",
-        cuotas: 1,
-        monto: producto.precio_contado,
-        estado_pago: "completado",
-      },
-    ]);
+      if (existente) {
+        if (existente.cantidad >= producto.stock) {
+          toast.error("No hay más stock disponible");
+          return prev;
+        }
+
+        return prev.map((p) =>
+          p.id === producto.id
+            ? {
+                ...p,
+                cantidad: p.cantidad + 1,
+                monto: calcularMonto(p, p.cuotas) * (p.cantidad + 1),
+              }
+            : p,
+        );
+      }
+
+      if (producto.stock <= 0) {
+        toast.error("Producto sin stock");
+        return prev;
+      }
+
+      return [
+        ...prev,
+        {
+          ...producto,
+          cantidad: 1,
+          tipo_pago: "contado",
+          cuotas: 1,
+          monto_unitario: producto.precio_contado,
+          monto: producto.precio_contado,
+          estado_pago: "completado",
+        },
+      ];
+    });
   }
+
   function removerProducto(index) {
     setSeleccionados((prev) => prev.filter((_, i) => i !== index));
   }
 
   function actualizarCuotas(index, cuotas, producto) {
     const copia = [...seleccionados];
-    copia[index].monto = calcularMonto(producto, cuotas);
+    const unitario = calcularMonto(producto, cuotas);
+
     copia[index].cuotas = cuotas;
+    copia[index].monto_unitario = unitario;
+    copia[index].monto = unitario * copia[index].cantidad;
+
     setSeleccionados(copia);
   }
 
@@ -347,6 +386,49 @@ export function RegistrarCompraModal({ open, onClose }) {
                         ✕
                       </Button>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() =>
+                          setSeleccionados((prev) =>
+                            prev.map((x, idx) =>
+                              idx === i && x.cantidad > 1
+                                ? {
+                                    ...x,
+                                    cantidad: x.cantidad - 1,
+                                    monto: x.monto_unitario * (x.cantidad - 1),
+                                  }
+                                : x,
+                            ),
+                          )
+                        }
+                      >
+                        −
+                      </Button>
+
+                      <span className="text-sm">{p.cantidad}</span>
+
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() =>
+                          setSeleccionados((prev) =>
+                            prev.map((x, idx) =>
+                              idx === i && x.cantidad < p.stock
+                                ? {
+                                    ...x,
+                                    cantidad: x.cantidad + 1,
+                                    monto: x.monto_unitario * (x.cantidad + 1),
+                                  }
+                                : x,
+                            ),
+                          )
+                        }
+                      >
+                        +
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -359,11 +441,14 @@ export function RegistrarCompraModal({ open, onClose }) {
                             ? p.cantidad_cuotas
                             : 1;
 
+                        const unitario = calcularMonto(p, cuotas);
+
                         copia[i].tipo_pago = v;
                         copia[i].estado_pago =
                           v === "contado" ? "completado" : "pendiente";
                         copia[i].cuotas = cuotas;
-                        copia[i].monto = calcularMonto(p, cuotas);
+                        copia[i].monto_unitario = unitario;
+                        copia[i].monto = unitario * copia[i].cantidad;
 
                         setSeleccionados(copia);
                       }}

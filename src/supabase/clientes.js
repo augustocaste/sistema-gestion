@@ -86,11 +86,12 @@ export async function getComprasCliente(idCliente) {
         id,
         monto,
         estado_pago,
+        cantidad,
         producto (
           nombre
         )
       )
-    `
+    `,
     )
     .eq("id_cliente", idCliente)
     .order("fecha", { ascending: false });
@@ -128,13 +129,13 @@ export async function getCuotasVencidas() {
           )  
         )
       )
-    `
+    `,
     )
     .eq(
       "fecha_vencimiento",
       new Date().toLocaleDateString("sv-SE", {
         timeZone: "America/Argentina/Buenos_Aires",
-      })
+      }),
     )
     .eq("estado", "pendiente")
     .order("fecha_vencimiento", { ascending: true });
@@ -154,7 +155,7 @@ export async function getCuotasPorPlan(planCuotasId) {
       fecha_pagada,
       estado,
       monto_actual_pagado
-    `
+    `,
     )
     .eq("id_plan_cuotas", planCuotasId)
     .order("nro_cuota", { ascending: true });
@@ -168,12 +169,13 @@ export async function obtenerPlanCuotasPorProducto(compraProductoId) {
     .from("compra_producto")
     .select(
       `
+      cantidad,
       plan_cuotas (
         id,
         monto_cuota,
         cant_cuotas
       )
-    `
+    `,
     )
     .eq("id", compraProductoId)
     .single();
@@ -238,7 +240,7 @@ export async function getCuotas({ estado, search, page = 1, pageSize = 10 }) {
         )
       )
       `,
-      { count: "exact" }
+      { count: "exact" },
     )
     .eq("estado", estado)
     .order("fecha_vencimiento", { ascending: true })
@@ -248,7 +250,7 @@ export async function getCuotas({ estado, search, page = 1, pageSize = 10 }) {
   if (clientesIds.length > 0) {
     query = query.in(
       "plan_cuotas.compra_producto.compra.cliente.id",
-      clientesIds
+      clientesIds,
     );
   }
 

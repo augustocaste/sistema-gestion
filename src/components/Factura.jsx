@@ -19,20 +19,15 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
 
   const fechaFactura = compra?.fecha ?? "";
   const total = factura.monto;
+  const cantidad = factura.cantidad ?? 1;
+  const precioUnitario = total / cantidad;
 
   return (
     <div
       ref={ref}
       className="max-w-[210mm] mx-auto bg-white shadow-lg print:shadow-none"
+      style={{ pageBreakAfter: "always" }}
     >
-      {/* ACCIONES */}
-      <div className="p-4 print:hidden flex justify-end">
-        <Button onClick={onPrint} variant="outline" className="gap-2">
-          <Printer className="w-4 h-4" />
-          Imprimir
-        </Button>
-      </div>
-
       <div className="p-8 pt-2">
         {/* HEADER */}
         <div className="flex justify-between items-start mb-8">
@@ -101,13 +96,21 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
           </thead>
           <tbody>
             <tr>
-              <td className="border-2 px-2 py-1">{producto?.nombre}</td>
+              <td className="border-2 px-2 py-1">
+                {producto?.nombre}
+                {cantidad > 1 && (
+                  <span className="text-sm text-gray-600"> × {cantidad}</span>
+                )}
+              </td>
+
               <td className="border-2 px-2 py-1 text-center">
                 {esCuotas ? `${cuotas.length} cuotas` : "Contado"}
               </td>
+
               <td className="border-2 px-2 py-1 text-center">
-                $ {total.toLocaleString("es-AR")}
+                $ {precioUnitario.toLocaleString("es-AR")}
               </td>
+
               <td className="border-2 px-2 py-1 text-center font-bold">
                 $ {total.toLocaleString("es-AR")}
               </td>
