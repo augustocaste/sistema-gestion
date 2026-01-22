@@ -15,6 +15,11 @@ export function PlanPagosModal({ abierto, onCerrar, plan }) {
   console.log(plan);
   const [cuotas, setCuotas] = useState([]);
 
+  function parseFechaLocal(fecha) {
+    const [y, m, d] = fecha.split("-");
+    return new Date(y, m - 1, d);
+  }
+
   const [cuotaSeleccionada, setCuotaSeleccionada] = useState(null);
   const [tipoPago, setTipoPago] = useState(null);
   const [modalPagoAbierto, setModalPagoAbierto] = useState(false);
@@ -42,11 +47,11 @@ export function PlanPagosModal({ abierto, onCerrar, plan }) {
                 <p className="font-medium">Cuota Nro: {cuota.nro_cuota}</p>
                 <p className="text-xs text-muted-foreground">
                   {cuota.estado === "pagada"
-                    ? `Pagada el ${new Date(
-                        cuota.fecha_pagada
+                    ? `Pagada el ${parseFechaLocal(
+                        cuota.fecha_pagada,
                       ).toLocaleDateString("es-AR")}`
-                    : `Vence el ${new Date(
-                        cuota.fecha_vencimiento
+                    : `Vence el ${parseFechaLocal(
+                        cuota.fecha_vencimiento,
                       ).toLocaleDateString("es-AR")}`}
                 </p>
               </div>
