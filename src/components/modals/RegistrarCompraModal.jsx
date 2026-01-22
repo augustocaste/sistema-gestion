@@ -168,6 +168,8 @@ export function RegistrarCompraModal({ open, onClose }) {
           ...producto,
           cantidad: 1,
           tipo_pago: "contado",
+          medio_contado: "efectivo",
+          alias: null,
           cuotas: 1,
           monto_unitario: producto.precio_contado,
           monto: producto.precio_contado,
@@ -195,6 +197,24 @@ export function RegistrarCompraModal({ open, onClose }) {
   async function guardarCompra() {
     if (!fecha || seleccionados.length === 0) {
       return toast.error("Faltan datos obligatorios");
+    }
+    for (const p of seleccionados) {
+      if (p.tipo_pago === "contado") {
+        if (!p.medio_contado) {
+          return toast.error(
+            `Elegí el medio de pago para el producto "${p.nombre}"`,
+          );
+        }
+
+        if (
+          p.medio_contado === "transferencia" &&
+          (!p.alias || p.alias.trim() === "")
+        ) {
+          return toast.error(
+            `Ingresá el alias de la transferencia para "${p.nombre}"`,
+          );
+        }
+      }
     }
 
     setLoading(false);
@@ -483,6 +503,45 @@ export function RegistrarCompraModal({ open, onClose }) {
                             ))}
                         </SelectContent>
                       </Select>
+                    )}
+                    {p.tipo_pago === "contado" && (
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">
+                          Medio de pago
+                        </label>
+
+                        <Select
+                          value={p.medio_contado}
+                          onValueChange={(v) => {
+                            const copia = [...seleccionados];
+                            copia[i].medio_contado = v;
+                            copia[i].alias = v === "transferencia" ? "" : null;
+                            setSeleccionados(copia);
+                          }}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="efectivo">Efectivo</SelectItem>
+                            <SelectItem value="transferencia">
+                              Transferencia
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+
+                        {p.medio_contado === "transferencia" && (
+                          <Input
+                            placeholder="Alias / CVU"
+                            value={p.alias ?? ""}
+                            onChange={(e) => {
+                              const copia = [...seleccionados];
+                              copia[i].alias = e.target.value;
+                              setSeleccionados(copia);
+                            }}
+                          />
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
