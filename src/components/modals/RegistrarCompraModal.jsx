@@ -243,7 +243,20 @@ export function RegistrarCompraModal({ open, onClose }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto bg-white p-4 sm:p-6">
+      <DialogContent
+        className="
+    sm:max-w-lg
+    w-[95vw]
+    max-h-[90vh]
+    bg-white
+    rounded-2xl
+    border
+    shadow-lg
+    p-0
+    flex
+    flex-col
+  "
+      >
         <DialogHeader>
           <DialogTitle className="text-lg">Registrar compra</DialogTitle>
         </DialogHeader>
