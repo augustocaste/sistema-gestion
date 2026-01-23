@@ -108,7 +108,7 @@ export function ProductModal({
       form.doce_cuotas < 0
     ) {
       toast.error(
-        "Por favor, ingresa valores válidos para precio, stock y cuotas"
+        "Por favor, ingresa valores válidos para precio, stock y cuotas",
       );
       setLoading(false);
       return;
@@ -128,7 +128,7 @@ export function ProductModal({
       toast.success(
         modo === "editar"
           ? "Producto actualizado correctamente"
-          : "Producto creado correctamente"
+          : "Producto creado correctamente",
       );
 
       onCerrar();
@@ -142,90 +142,109 @@ export function ProductModal({
 
   return (
     <Dialog open={abierto} onOpenChange={onCerrar}>
-      <DialogContent className="sm:max-w-lg bg-white rounded-2xl border shadow-lg p-6">
-        <DialogHeader>
+      <DialogContent
+        className="
+        w-[95vw]
+        sm:max-w-lg
+        h-[90vh]
+        max-h-[90vh]
+        bg-white
+        rounded-2xl
+        border
+        shadow-lg
+        p-0
+        flex
+        flex-col
+        overflow-hidden
+      "
+      >
+        {/* ---------- HEADER ---------- */}
+        <DialogHeader className="px-6 pt-6 shrink-0">
           <DialogTitle className="text-xl font-bold">
             {modo === "editar" ? "Editar Producto" : "Agregar Producto"}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
-          {/* Nombre */}
+        {/* ---------- BODY (SCROLL INTERNO) ---------- */}
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="grid gap-4">
+            {/* Nombre */}
+            <div>
+              <label className="text-sm font-medium">Nombre</label>
+              <Input
+                name="nombre"
+                placeholder="Ingrese el nombre del producto"
+                value={form.nombre}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, nombre: e.target.value }))
+                }
+              />
+            </div>
 
-          <div>
-            <label className="text-sm font-medium">Nombre</label>
-            <Input
-              name="nombre"
-              placeholder="Ingrese el nombre del producto"
-              value={form.nombre}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, nombre: e.target.value }))
-              }
-            />
+            {/* Precio contado */}
+            <div>
+              <label className="text-sm font-medium">Precio Contado</label>
+              <Input
+                type="number"
+                name="precio_contado"
+                placeholder="Ingrese un valor numérico"
+                value={form.precio_contado === 0 ? "" : form.precio_contado}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Stock */}
+            <div>
+              <label className="text-sm font-medium">Stock</label>
+              <Input
+                type="number"
+                name="stock"
+                placeholder="Ingrese un valor numérico"
+                value={form.stock === 0 ? "" : form.stock}
+                onChange={handleChange}
+              />
+            </div>
+
+            {/* Selector cuotas */}
+            <div>
+              <label className="text-sm font-medium">Cantidad de Cuotas</label>
+              <Select
+                value={String(form.cantidad_cuotas)}
+                onValueChange={handleCuotasChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sin cuotas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">Sin cuotas</SelectItem>
+                  <SelectItem value="3">3 cuotas</SelectItem>
+                  <SelectItem value="6">6 cuotas</SelectItem>
+                  <SelectItem value="9">9 cuotas</SelectItem>
+                  <SelectItem value="12">12 cuotas</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Cuotas dinámicas */}
+            {CUOTAS_CONFIG.filter((c) => form.cantidad_cuotas >= c.value).map(
+              (cuota) => (
+                <div key={cuota.name}>
+                  <label className="text-sm font-medium">{cuota.label}</label>
+                  <Input
+                    type="number"
+                    name={cuota.name}
+                    placeholder="Ingrese un valor numérico"
+                    value={form[cuota.name] === 0 ? "" : form[cuota.name]}
+                    onChange={handleChange}
+                  />
+                </div>
+              ),
+            )}
           </div>
-
-          {/* Precio contado */}
-          <div>
-            <label className="text-sm font-medium">Precio Contado</label>
-            <Input
-              type="number"
-              name="precio_contado"
-              placeholder="Ingrese un valor numerico (0 si queda vacío)"
-              value={form.precio_contado === 0 ? "" : form.precio_contado}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* Stock */}
-          <div>
-            <label className="text-sm font-medium">Stock</label>
-            <Input
-              type="number"
-              name="stock"
-              placeholder="Ingrese un valor numerico (0 si queda vacío)"
-              value={form.stock === 0 ? "" : form.stock}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* Selector cuotas */}
-          <div>
-            <label className="text-sm font-medium">Cantidad de Cuotas</label>
-            <Select
-              value={String(form.cantidad_cuotas)}
-              onValueChange={handleCuotasChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Sin cuotas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="0">Sin cuotas</SelectItem>
-                <SelectItem value="3">3 cuotas</SelectItem>
-                <SelectItem value="6">6 cuotas</SelectItem>
-                <SelectItem value="9">9 cuotas</SelectItem>
-                <SelectItem value="12">12 cuotas</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Cuotas */}
-          {CUOTAS_CONFIG.filter((c) => form.cantidad_cuotas >= c.value).map(
-            (cuota) => (
-              <div key={cuota.name}>
-                <label className="text-sm font-medium">{cuota.label}</label>
-                <Input
-                  type="number"
-                  name={cuota.name}
-                  placeholder="Ingrese un valor numerico (0 si queda vacío)"
-                  value={form[cuota.name] === 0 ? "" : form[cuota.name]}
-                  onChange={handleChange}
-                />
-              </div>
-            )
-          )}
         </div>
 
-        <DialogFooter className="flex justify-end gap-3">
+        {/* ---------- FOOTER ---------- */}
+        <DialogFooter className="px-6 py-4 border-t shrink-0 flex justify-end gap-3">
           <Button variant="outline" onClick={onCerrar} disabled={loading}>
             Cancelar
           </Button>
@@ -233,8 +252,8 @@ export function ProductModal({
             {loading
               ? "Guardando..."
               : modo === "editar"
-              ? "Guardar"
-              : "Agregar"}
+                ? "Guardar"
+                : "Agregar"}
           </Button>
         </DialogFooter>
       </DialogContent>
