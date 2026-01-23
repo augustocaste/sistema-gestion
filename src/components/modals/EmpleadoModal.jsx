@@ -176,7 +176,6 @@ export function EmpleadoModal({
               <div>
                 <label className="text-sm font-medium">Contraseña</label>
                 <Input
-                  type="password"
                   name="password"
                   value={form.password}
                   onChange={handleChange}
@@ -194,8 +193,8 @@ export function EmpleadoModal({
             {loading
               ? "Guardando..."
               : modo === "editar"
-              ? "Guardar"
-              : "Registrar"}
+                ? "Guardar"
+                : "Registrar"}
           </Button>
         </DialogFooter>
       </DialogContent>
