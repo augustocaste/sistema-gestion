@@ -108,25 +108,30 @@ export function EmpleadoModal({
     <Dialog open={abierto} onOpenChange={onCerrar}>
       <DialogContent
         className="
-    sm:max-w-lg
-    w-[95vw]
-    max-h-[90vh]
-    bg-white
-    rounded-2xl
-    border
-    shadow-lg
-    p-0
-    flex
-    flex-col
-  "
+        w-[95vw]
+        sm:max-w-lg
+        h-[90vh]
+        max-h-[90vh]
+        bg-white
+        rounded-2xl
+        border
+        shadow-lg
+        p-0
+        flex
+        flex-col
+        overflow-hidden
+      "
       >
-        <DialogHeader className="px-6 pt-6">
+        {/* ---------- HEADER ---------- */}
+        <DialogHeader className="px-6 pt-6 shrink-0">
           <DialogTitle className="text-xl font-bold">
-            {modo === "editar" ? "Editar Producto" : "Agregar Producto"}
+            {modo === "editar" ? "Editar Empleado" : "Agregar Empleado"}
           </DialogTitle>
         </DialogHeader>
+
+        {/* ---------- BODY (SCROLL) ---------- */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4">
             <div>
               <label className="text-sm font-medium">Nombre</label>
               <Input
@@ -193,6 +198,7 @@ export function EmpleadoModal({
                 <div>
                   <label className="text-sm font-medium">Contraseña</label>
                   <Input
+                    type="password"
                     name="password"
                     value={form.password}
                     onChange={handleChange}
@@ -200,9 +206,13 @@ export function EmpleadoModal({
                 </div>
               </>
             )}
+
+            {/* 🔥 ACA PODÉS METER 100 CUOTAS Y NO SE ROMPE */}
           </div>
         </div>
-        <DialogFooter className="flex justify-end gap-3">
+
+        {/* ---------- FOOTER ---------- */}
+        <DialogFooter className="px-6 py-4 border-t shrink-0 flex justify-end gap-3">
           <Button variant="outline" onClick={onCerrar} disabled={loading}>
             Cancelar
           </Button>
