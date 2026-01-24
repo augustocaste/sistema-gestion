@@ -1,17 +1,5 @@
 import { supabase } from "./client";
 
-function agruparProductos(seleccionados) {
-  return seleccionados.reduce((acc, p) => {
-    acc[p.id] = (acc[p.id] || 0) + p.cantidad;
-    return acc;
-  }, {});
-}
-
-function sumarDias(fecha, dias) {
-  const f = new Date(fecha);
-  f.setDate(f.getDate() + dias);
-  return f.toISOString().split("T")[0];
-}
 export async function registrarCompra(
   fecha,
   empleado_id,
@@ -60,7 +48,8 @@ export async function getFacturasByCompra(compraId) {
         fecha,
         cliente: id_cliente (
           nombre,
-          apellido
+          apellido,
+          telefono
         )
       ),
 
@@ -78,7 +67,7 @@ export async function getFacturasByCompra(compraId) {
     )
     .eq("id_compra", compraId)
     .order("id", { ascending: true });
-  console.log("la query da " + JSON.stringify(data));
+
   if (error) throw error;
 
   return data;

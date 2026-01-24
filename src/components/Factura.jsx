@@ -1,12 +1,25 @@
+"use client";
+
 import { forwardRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Printer, Phone } from "lucide-react";
+
+const PhoneIcon = () => (
+  <svg
+    style={{ width: "16px", height: "16px" }}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#2563eb"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+  </svg>
+);
 
 export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
-  if (!factura) return null;
-
   const [garantiaMeses, setGarantiaMeses] = useState("");
+
+  if (!factura) return null;
 
   const producto = factura.producto;
   const compra = factura.compra;
@@ -25,199 +38,501 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
   return (
     <div
       ref={ref}
-      className="max-w-[210mm] mx-auto bg-white shadow-lg print:shadow-none"
-      style={{ pageBreakAfter: "always" }}
+      style={{
+        maxWidth: "210mm",
+        margin: "0 auto",
+        backgroundColor: "white",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        fontFamily: "Arial, sans-serif",
+        pageBreakAfter: "always",
+        padding: "32px",
+        paddingTop: "8px",
+      }}
     >
-      <div className="p-8 pt-2">
-        {/* HEADER */}
-        <div className="flex justify-between items-start mb-8">
-          {/* LOGO */}
-          <div className="flex flex-col items-center">
-            <svg viewBox="0 0 100 80" className="w-24 h-20 mb-2">
-              <path
-                d="M50 5 L95 40 L85 40 L85 75 L15 75 L15 40 L5 40 Z"
-                fill="none"
-                stroke="#1a5c4c"
-                strokeWidth="4"
-              />
-              <rect
-                x="40"
-                y="45"
-                width="20"
-                height="30"
-                fill="none"
-                stroke="#1a5c4c"
-                strokeWidth="3"
-              />
-            </svg>
-            <h2 className="text-xl font-bold">PINO-ELECTRO</h2>
-            <p className="text-sm tracking-widest text-gray-600">PIPINAS</p>
-          </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "32px",
+        }}
+      >
+        {/* LOGO */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <svg
+            viewBox="0 0 100 80"
+            style={{ width: "96px", height: "80px", marginBottom: "8px" }}
+          >
+            <path
+              d="M50 5 L95 40 L85 40 L85 75 L15 75 L15 40 L5 40 Z"
+              fill="none"
+              stroke="#1a5c4c"
+              strokeWidth="4"
+            />
+            <rect
+              x="40"
+              y="45"
+              width="20"
+              height="30"
+              fill="none"
+              stroke="#1a5c4c"
+              strokeWidth="3"
+            />
+          </svg>
+          <h2 style={{ fontSize: "20px", fontWeight: "bold", margin: 0 }}>
+            PINO-ELECTRO
+          </h2>
+          <p
+            style={{
+              fontSize: "14px",
+              letterSpacing: "3px",
+              color: "#666",
+              margin: 0,
+            }}
+          >
+            PIPINAS
+          </p>
+        </div>
 
-          {/* TITULO + DATOS */}
-          <div className="flex-1 ml-8">
-            <h1 className="text-4xl font-bold text-right mb-6">FACTURA</h1>
+        {/* TITULO + DATOS */}
+        <div style={{ flex: 1, marginLeft: "32px" }}>
+          <h1
+            style={{
+              fontSize: "36px",
+              fontWeight: "bold",
+              textAlign: "right",
+              marginBottom: "24px",
+            }}
+          >
+            FACTURA
+          </h1>
 
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <label className="min-w-[140px] text-sm font-medium">
-                  CLIENTE:
-                </label>
-                <Input
-                  value={clienteNombre}
-                  readOnly
-                  className="border-0 border-b rounded-none"
-                />
+          <div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginBottom: "12px",
+              }}
+            >
+              <label
+                style={{ minWidth: "140px", fontSize: "14px", fontWeight: 500 }}
+              >
+                CLIENTE:
+              </label>
+              <div
+                style={{
+                  flex: 1,
+                  borderBottom: "1px solid #ccc",
+                  padding: "6px 0 4px",
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  minHeight: "24px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {clienteNombre}
               </div>
+            </div>
 
-              <div className="flex items-center gap-2">
-                <label className="min-w-[140px] text-sm font-medium">
-                  FECHA:
-                </label>
-                <Input
-                  value={fechaFactura}
-                  readOnly
-                  className="border-0 border-b rounded-none"
-                />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginBottom: "12px",
+              }}
+            >
+              <label
+                style={{ minWidth: "140px", fontSize: "14px", fontWeight: 500 }}
+              >
+                FECHA:
+              </label>
+              <div
+                style={{
+                  flex: 1,
+                  borderBottom: "1px solid #ccc",
+                  padding: "6px 0 4px",
+                  fontSize: "14px",
+                  lineHeight: "20px",
+                  minHeight: "24px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {fechaFactura}
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* TABLA PRODUCTO */}
-        <table className="w-full border-collapse border-2 border-gray-900 mb-6">
-          <thead>
-            <tr>
-              <th className="border-2 px-4 py-2 text-left w-[40%]">OBJETO</th>
-              <th className="border-2 px-4 py-2 text-center w-[20%]">CUOTAS</th>
-              <th className="border-2 px-4 py-2 text-center w-[20%]">PRECIO</th>
-              <th className="border-2 px-4 py-2 text-center w-[20%]">TOTAL</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border-2 px-2 py-1">
-                {producto?.nombre}
-                {cantidad > 1 && (
-                  <span className="text-sm text-gray-600"> × {cantidad}</span>
-                )}
-              </td>
+      {/* TABLA PRODUCTO */}
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          border: "2px solid #111",
+          marginBottom: "24px",
+        }}
+      >
+        <thead>
+          <tr>
+            <th
+              style={{
+                border: "2px solid #111",
+                padding: "8px 16px",
+                textAlign: "left",
+                fontWeight: "bold",
+                backgroundColor: "white",
+                width: "40%",
+              }}
+            >
+              OBJETO
+            </th>
+            <th
+              style={{
+                border: "2px solid #111",
+                padding: "8px 16px",
+                textAlign: "center",
+                fontWeight: "bold",
+                backgroundColor: "white",
+                width: "20%",
+              }}
+            >
+              CUOTAS
+            </th>
+            <th
+              style={{
+                border: "2px solid #111",
+                padding: "8px 16px",
+                textAlign: "center",
+                fontWeight: "bold",
+                backgroundColor: "white",
+                width: "20%",
+              }}
+            >
+              PRECIO
+            </th>
+            <th
+              style={{
+                border: "2px solid #111",
+                padding: "8px 16px",
+                textAlign: "center",
+                fontWeight: "bold",
+                backgroundColor: "white",
+                width: "20%",
+              }}
+            >
+              TOTAL
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style={{ border: "2px solid #111", padding: "4px 8px" }}>
+              {producto?.nombre}
+              {cantidad > 1 && (
+                <span style={{ fontSize: "14px", color: "#666" }}>
+                  {" "}
+                  × {cantidad}
+                </span>
+              )}
+            </td>
+            <td
+              style={{
+                border: "2px solid #111",
+                padding: "4px 8px",
+                textAlign: "center",
+              }}
+            >
+              {esCuotas ? `${cuotas.length} cuotas` : "Contado"}
+            </td>
+            <td
+              style={{
+                border: "2px solid #111",
+                padding: "4px 8px",
+                textAlign: "center",
+              }}
+            >
+              $ {precioUnitario.toLocaleString("es-AR")}
+            </td>
+            <td
+              style={{
+                border: "2px solid #111",
+                padding: "4px 8px",
+                textAlign: "center",
+                fontWeight: "bold",
+              }}
+            >
+              $ {total.toLocaleString("es-AR")}
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-              <td className="border-2 px-2 py-1 text-center">
+      {/* INFO DE PAGO + TOTALES */}
+      <div style={{ display: "flex", gap: "32px", marginBottom: "24px" }}>
+        {/* IZQUIERDA */}
+        <div style={{ flex: 1 }}>
+          <h3
+            style={{
+              fontWeight: "bold",
+              fontSize: "18px",
+              marginBottom: "12px",
+            }}
+          >
+            INFORMACIÓN DE PAGO
+          </h3>
+
+          <div style={{ marginBottom: "16px", fontSize: "14px" }}>
+            <p style={{ margin: 0 }}>
+              Plan de pago:{" "}
+              <strong>
                 {esCuotas ? `${cuotas.length} cuotas` : "Contado"}
-              </td>
+              </strong>
+            </p>
+          </div>
 
-              <td className="border-2 px-2 py-1 text-center">
-                $ {precioUnitario.toLocaleString("es-AR")}
-              </td>
+          <h4
+            style={{
+              fontWeight: "bold",
+              fontStyle: "italic",
+              fontSize: "14px",
+              marginBottom: "8px",
+            }}
+          >
+            Términos y Condiciones:
+          </h4>
+          <p
+            style={{
+              fontSize: "12px",
+              color: "#444",
+              lineHeight: 1.6,
+              marginBottom: "16px",
+            }}
+          >
+            El pago debe realizarse dentro de los plazos acordados.
+            <br />
+            Garantía de{" "}
+            <input
+              value={garantiaMeses}
+              onChange={(e) => setGarantiaMeses(e.target.value)}
+              style={{
+                display: "inline-block",
+                width: "50px", // Mayor espacio para asegurar que el número entre completo
+                height: "30px", // Aseguramos que el alto sea suficiente
+                border: "none",
+                borderBottom: "2px solid #1a5c4c", // Borde inferior más grueso
+                textAlign: "center", // Centrado de texto
+                fontSize: "16px", // Mejor tamaño para que se vea bien
+                lineHeight: "30px", // Centrado verticalmente, coincidiendo con el alto
+                padding: "0", // Eliminamos el padding adicional para evitar el corte
+                outline: "none", // Elimina el contorno azul del campo al seleccionar
+                backgroundColor: "transparent", // Fondo transparente
+                boxSizing: "border-box", // Asegura que el padding no afecte el tamaño
+                whiteSpace: "nowrap", // Evita el salto de línea dentro del input
+              }}
+            />
+            meses a partir de la entrega (con boleta de matriculado en productos
+            específicos).
+          </p>
 
-              <td className="border-2 px-2 py-1 text-center font-bold">
+          <p
+            style={{
+              color: "#16a34a",
+              fontWeight: "bold",
+              fontSize: "18px",
+              margin: 0,
+            }}
+          >
+            GRACIAS
+          </p>
+
+          <div style={{ marginTop: "8px", fontSize: "14px", color: "#2563eb" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginBottom: "4px",
+              }}
+            >
+              <PhoneIcon />
+              <span>2213608367</span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginBottom: "4px",
+              }}
+            >
+              <PhoneIcon />
+              <span>2223426252</span>
+            </div>
+          </div>
+        </div>
+
+        {/* DERECHA */}
+        <div style={{ width: "256px" }}>
+          <div
+            style={{
+              backgroundColor: "#e0f2fe",
+              padding: "16px",
+              marginBottom: "16px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "4px",
+              }}
+            >
+              <span style={{ fontSize: "14px" }}>Subtotal</span>
+              <span style={{ fontSize: "14px" }}>
                 $ {total.toLocaleString("es-AR")}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        {/* INFO DE PAGO + TOTALES */}
-        <div className="flex gap-8 mb-6">
-          {/* IZQUIERDA */}
-          <div className="flex-1">
-            <h3 className="font-bold text-lg mb-3">INFORMACIÓN DE PAGO</h3>
-
-            <div className="mb-4">
-              <p className="text-sm">
-                Plan de pago:{" "}
-                <strong>
-                  {esCuotas ? `${cuotas.length} cuotas` : "Contado"}
-                </strong>
-              </p>
+              </span>
             </div>
 
-            <h4 className="font-bold italic text-sm mb-2">
-              Términos y Condiciones:
-            </h4>
-            <p className="text-xs text-gray-700 leading-relaxed mb-4">
-              El pago debe realizarse dentro de los plazos acordados.
-              <br />
-              Garantía de{" "}
-              <Input
-                value={garantiaMeses}
-                onChange={(e) => setGarantiaMeses(e.target.value)}
-                className="inline-block w-8 h-5 border-0 border-b border-gray-400 rounded-none focus-visible:ring-0 text-xs text-center mx-1 p-0"
-              />{" "}
-              meses a partir de la entrega (con boleta de matriculado en
-              productos específicos).
-            </p>
-
-            <p className="text-green-600 font-bold text-lg">GRACIAS</p>
-
-            <div className="mt-2 text-sm text-blue-600">
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                <span>2213608367</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                <span>2223426252</span>
-              </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                fontWeight: "bold",
+                borderTop: "1px solid #7dd3fc",
+                paddingTop: "8px",
+                marginTop: "8px",
+              }}
+            >
+              <span>TOTAL</span>
+              <span>$ {total.toLocaleString("es-AR")}</span>
             </div>
           </div>
 
-          {/* DERECHA */}
-          <div className="w-64">
-            <div className="bg-sky-100 p-4 mb-4">
-              <div className="flex justify-between mb-1">
-                <span className="text-sm">Subtotal</span>
-                <span className="text-sm">
-                  $ {total.toLocaleString("es-AR")}
-                </span>
-              </div>
-
-              <div className="flex justify-between font-bold border-t border-sky-300 pt-2 mt-2">
-                <span>TOTAL</span>
-                <span>$ {total.toLocaleString("es-AR")}</span>
-              </div>
-            </div>
-
-            {/* CUOTAS */}
-            {esCuotas && (
-              <div className="mt-4">
-                <h4 className="font-bold text-sm mb-2">Detalle de Cuotas</h4>
-                <table className="w-full text-xs border">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="border px-2 py-1">N°</th>
-                      <th className="border px-2 py-1">Monto</th>
-                      <th className="border px-2 py-1">Vencimiento</th>
+          {/* CUOTAS */}
+          {esCuotas && (
+            <div style={{ marginTop: "16px" }}>
+              <h4
+                style={{
+                  fontWeight: "bold",
+                  fontSize: "14px",
+                  marginBottom: "8px",
+                }}
+              >
+                Detalle de Cuotas
+              </h4>
+              <table
+                style={{
+                  width: "100%",
+                  fontSize: "12px",
+                  borderCollapse: "collapse",
+                  border: "1px solid #ccc",
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "4px 8px",
+                        backgroundColor: "#f3f4f6",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      N°
+                    </th>
+                    <th
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "4px 8px",
+                        backgroundColor: "#f3f4f6",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Monto
+                    </th>
+                    <th
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "4px 8px",
+                        backgroundColor: "#f3f4f6",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Vencimiento
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cuotas.map((c) => (
+                    <tr key={c.nro_cuota}>
+                      <td
+                        style={{
+                          border: "1px solid #ccc",
+                          padding: "4px 8px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {c.nro_cuota}
+                      </td>
+                      <td
+                        style={{
+                          border: "1px solid #ccc",
+                          padding: "4px 8px",
+                          textAlign: "right",
+                        }}
+                      >
+                        ${" "}
+                        {factura.plan_cuotas.monto_cuota.toLocaleString(
+                          "es-AR",
+                        )}
+                      </td>
+                      <td
+                        style={{
+                          border: "1px solid #ccc",
+                          padding: "4px 8px",
+                          textAlign: "center",
+                        }}
+                      >
+                        {c.fecha_vencimiento}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {cuotas.map((c) => (
-                      <tr key={c.nro_cuota}>
-                        <td className="border px-2 py-1 text-center">
-                          {c.nro_cuota}
-                        </td>
-                        <td className="border px-2 py-1 text-right">
-                          $
-                          {factura.plan_cuotas.monto_cuota.toLocaleString(
-                            "es-AR",
-                          )}
-                        </td>
-                        <td className="border px-2 py-1 text-center">
-                          {c.fecha_vencimiento}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* FIRMAS */}
-            <div className="mt-6 pt-4">
-              <p className="italic font-serif text-lg">Brenda Valenzuela</p>
-              <p className="italic font-serif text-lg">Facundo Maciel</p>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          )}
+
+          {/* FIRMAS */}
+          <div style={{ marginTop: "24px", paddingTop: "16px" }}>
+            <p
+              style={{
+                fontStyle: "italic",
+                fontFamily: "Georgia, serif",
+                fontSize: "18px",
+                margin: "4px 0",
+              }}
+            >
+              Brenda Valenzuela
+            </p>
+            <p
+              style={{
+                fontStyle: "italic",
+                fontFamily: "Georgia, serif",
+                fontSize: "18px",
+                margin: "4px 0",
+              }}
+            >
+              Facundo Maciel
+            </p>
           </div>
         </div>
       </div>
