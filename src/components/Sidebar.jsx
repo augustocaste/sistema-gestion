@@ -38,7 +38,7 @@ export function Sidebar() {
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static",
-          open ? "translate-x-0" : "-translate-x-full"
+          open ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex h-full flex-col">
@@ -47,10 +47,10 @@ export function Sidebar() {
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
                 <span className="text-primary-foreground font-semibold text-sm">
-                  SG
+                  PE
                 </span>
               </div>
-              <span className="font-semibold text-sm">Sistema Gestión</span>
+              <span className="font-semibold text-sm">Pino-Electro</span>
             </div>
             <button
               onClick={() => setOpen(false)}
@@ -75,7 +75,7 @@ export function Sidebar() {
                         "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
                         isActive
                           ? "bg-accent text-accent-foreground"
-                          : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                          : "text-muted-foreground hover:bg-accent/50 hover:text-foreground",
                       )}
                       onClick={() => setOpen(false)}
                     >

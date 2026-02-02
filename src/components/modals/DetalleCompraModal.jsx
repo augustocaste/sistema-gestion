@@ -47,7 +47,15 @@ export function DetalleCompraModal({ abierto, onCerrar, compra }) {
 
   return (
     <Dialog open={abierto} onOpenChange={onCerrar}>
-      <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-auto">
+      <DialogContent
+        className="
+    max-h-[80vh]
+    overflow-y-auto
+    overflow-x-hidden
+    w-full
+    md:max-w-4xl
+  "
+      >
         <DialogHeader>
           <DialogTitle>Compra #{compra.id}</DialogTitle>
         </DialogHeader>
@@ -75,7 +83,7 @@ export function DetalleCompraModal({ abierto, onCerrar, compra }) {
             <p className="text-base font-semibold">Productos</p>
 
             {/* TABLA (desktop) */}
-            <div className="hidden md:block">
+            <div className="hidden md:block overflow-x-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>

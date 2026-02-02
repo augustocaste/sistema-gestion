@@ -17,7 +17,9 @@ const PhoneIcon = () => (
 );
 
 export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
-  const [garantiaMeses, setGarantiaMeses] = useState("");
+  const garantia =
+    factura.producto.garantia == 0 ? false : factura.producto.garantia;
+  const [garantiaMeses, setGarantiaMeses] = useState(garantia || "");
 
   if (!factura) return null;
 

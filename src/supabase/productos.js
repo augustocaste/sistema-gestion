@@ -25,12 +25,14 @@ export async function createProducto(producto) {
     nombre,
     precio_contado,
     stock,
+    garantia,
     cantidad_cuotas,
     tres_cuotas,
     seis_cuotas,
     nueve_cuotas,
     doce_cuotas,
   } = producto;
+
   const { data, error } = await supabase
     .from("producto")
     .insert([
@@ -38,6 +40,7 @@ export async function createProducto(producto) {
         nombre,
         precio_contado,
         stock,
+        garantia,
         cantidad_cuotas,
         tres_cuotas,
         seis_cuotas,

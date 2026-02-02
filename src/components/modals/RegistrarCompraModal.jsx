@@ -57,6 +57,9 @@ export function RegistrarCompraModal({ open, onClose }) {
       case 1:
         unitario = producto.precio_contado;
         break;
+      case 2:
+        unitario = producto.precio_contado;
+        break;
       case 3:
         unitario = producto.tres_cuotas;
         break;
@@ -456,10 +459,7 @@ export function RegistrarCompraModal({ open, onClose }) {
                       value={p.tipo_pago}
                       onValueChange={(v) => {
                         const copia = [...seleccionados];
-                        const cuotas =
-                          v === "cuotas" && p.cantidad_cuotas > 0
-                            ? p.cantidad_cuotas
-                            : 1;
+                        const cuotas = v === "cuotas" ? 2 : 1;
 
                         const unitario = calcularMonto(p, cuotas);
 
@@ -479,9 +479,7 @@ export function RegistrarCompraModal({ open, onClose }) {
                       <SelectContent>
                         <SelectItem value="contado">Contado</SelectItem>
 
-                        {p.cantidad_cuotas > 0 && (
-                          <SelectItem value="cuotas">Cuotas</SelectItem>
-                        )}
+                        <SelectItem value="cuotas">Cuotas</SelectItem>
                       </SelectContent>
                     </Select>
 
@@ -493,9 +491,10 @@ export function RegistrarCompraModal({ open, onClose }) {
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
+
                         <SelectContent>
-                          {[3, 6, 9, 12]
-                            .filter((c) => c <= p.cantidad_cuotas)
+                          {[2, 3, 6, 9, 12]
+                            .filter((c) => c === 2 || c <= p.cantidad_cuotas)
                             .map((c) => (
                               <SelectItem key={c} value={String(c)}>
                                 {c} cuotas
@@ -504,7 +503,8 @@ export function RegistrarCompraModal({ open, onClose }) {
                         </SelectContent>
                       </Select>
                     )}
-                    {p.tipo_pago === "contado" && (
+
+                    {
                       <div className="space-y-2">
                         <label className="text-sm font-medium">
                           Medio de pago
@@ -542,7 +542,7 @@ export function RegistrarCompraModal({ open, onClose }) {
                           />
                         )}
                       </div>
-                    )}
+                    }
                   </div>
                 </div>
               ))}

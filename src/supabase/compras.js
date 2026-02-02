@@ -41,7 +41,8 @@ export async function getFacturasByCompra(compraId) {
       id_compra,
       cantidad,
       producto (
-        nombre
+        nombre,
+        garantia
       ),
 
       compra (

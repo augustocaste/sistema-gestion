@@ -50,6 +50,7 @@ export function ProductModal({
         nombre: producto.nombre || "",
         precio_contado: producto.precio_contado || 0,
         stock: producto.stock || 0,
+        garantia: producto.garantia || 0,
         cantidad_cuotas: producto.cantidad_cuotas || 0,
         tres_cuotas: producto.tres_cuotas || 0,
         seis_cuotas: producto.seis_cuotas || 0,
@@ -61,6 +62,7 @@ export function ProductModal({
         nombre: "",
         precio_contado: 0,
         stock: 0,
+        garantia: 0,
         cantidad_cuotas: 0,
         tres_cuotas: 0,
         seis_cuotas: 0,
@@ -101,6 +103,7 @@ export function ProductModal({
     if (
       form.precio_contado < 0 ||
       form.stock < 0 ||
+      form.garantia < 0 ||
       form.cantidad_cuotas < 0 ||
       form.tres_cuotas < 0 ||
       form.seis_cuotas < 0 ||
@@ -201,6 +204,16 @@ export function ProductModal({
                 name="stock"
                 placeholder="Ingrese un valor numérico"
                 value={form.stock === 0 ? "" : form.stock}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Garantia</label>
+              <Input
+                type="number"
+                name="garantia"
+                placeholder="Ingrese meses de garantia para este producto"
+                value={form.garantia === 0 ? "" : form.garantia}
                 onChange={handleChange}
               />
             </div>

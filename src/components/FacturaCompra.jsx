@@ -91,11 +91,12 @@ export function FacturasCompra({ facturas }) {
   function arrayBufferToBase64(buffer) {
     let binary = "";
     const bytes = new Uint8Array(buffer);
-    const length = bytes.byteLength;
-    for (let i = 0; i < length; i++) {
+
+    for (let i = 0; i < bytes.length; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
-    return window.btoa(binary); // Convertir a Base64
+
+    return window.btoa(binary); // 🔥 BASE64 PURO
   }
 
   // Función para subir el archivo a Backblaze
@@ -164,20 +165,24 @@ export function FacturasCompra({ facturas }) {
     try {
       setLoadingWsp(true);
 
-      // Generar el PDF con todas las facturas
-      const pdfBuffer = await generarPDF(facturas);
-      console.log("PDF generado exitosamente ", pdfBuffer);
+      // 1. Generar PDF
+      const pdfArrayBuffer = await generarPDF(facturas);
 
-      // Subir el PDF a Backblaze
+      // 2. Convertir a base64 PURO (clave)
+      const pdfBase64 = arrayBufferToBase64(pdfArrayBuffer);
+
+      // 3. Subir a Backblaze
       const url = await subirArchivoABackblaze({
-        fileBuffer: pdfBuffer,
+        fileBuffer: pdfBase64,
         filename: `facturas-${Date.now()}.pdf`,
-        mime: "application/pdf", // MIME tipo para PDF
+        mime: "application/pdf",
       });
 
+      // 4. Enviar por WhatsApp
       const texto = encodeURIComponent(
         `Hola 👋\nTe envío las facturas en PDF:\n${url}`,
       );
+
       window.open(`https://wa.me/?text=${texto}`, "_blank");
     } catch (e) {
       console.error("Error al compartir las facturas:", e);
