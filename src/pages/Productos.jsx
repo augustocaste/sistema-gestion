@@ -115,17 +115,23 @@ export function Productos() {
   return (
     <DashboardLayout>
       {/* CONTENEDOR CENTRADO */}
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 space-y-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* HEADER */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Productos</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">
+              Productos
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Gestiona tu inventario
             </p>
           </div>
 
-          <Button className="gap-2 w-full sm:w-auto" onClick={abrirModalCrear}>
+          <Button
+            className="gap-2 w-full sm:w-auto"
+            size="sm"
+            onClick={abrirModalCrear}
+          >
             <Plus className="h-4 w-4" />
             Nuevo Producto
           </Button>
@@ -133,8 +139,8 @@ export function Productos() {
 
         <Card>
           {/* BUSCADOR */}
-          <div className="p-4 border-b">
-            <div className="relative max-w-md">
+          <div className="p-3 sm:p-4 border-b">
+            <div className="relative w-full sm:max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 value={search}
@@ -174,7 +180,15 @@ export function Productos() {
                 ) : (
                   productos.map((p) => (
                     <TableRow key={p.id}>
-                      <TableCell className="font-medium">{p.nombre}</TableCell>
+                      <TableCell className="font-medium max-w-[160px] sm:max-w-none overflow-hidden">
+                        <span
+                          className="block truncate break-words"
+                          title={p.nombre}
+                        >
+                          {p.nombre}
+                        </span>
+                      </TableCell>
+
                       <TableCell className="text-right">
                         {p.precio_contado}
                       </TableCell>
@@ -219,8 +233,8 @@ export function Productos() {
           </div>
 
           {/* PAGINACIÓN */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4">
-            <p className="text-sm text-muted-foreground">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Página {pagina} de {totalPaginas} | Total: {totalProductos}
             </p>
 

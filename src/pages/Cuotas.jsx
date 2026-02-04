@@ -225,6 +225,12 @@ export function Cuotas() {
                   </div>
                 );
               })}
+              {cuotas.length === 0 && !loading && (
+                <div className="flex h-40 flex-col items-center justify-center gap-2 text-muted-foreground">
+                  <span className="text-lg font-semibold">No hay cuotas</span>
+                  <span className="text-sm">No se encontraron resultados</span>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 border-t">

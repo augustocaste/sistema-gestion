@@ -30,11 +30,26 @@ const stats = [
   },
 ];
 
-export function StatsCards({ onLoaded }) {
+const neonRings = [
+  "ring-2 ring-blue-500/40", // Azul
+  "ring-2 ring-red-500/40", // Rojo
+  "ring-2 ring-yellow-400/40", // Amarillo
+  "ring-2 ring-green-500/40", // Verde
+];
+
+export function StatsCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {stats.map((stat) => (
-        <Card key={stat.title} className="border-border">
+      {stats.map((stat, index) => (
+        <Card
+          key={stat.title}
+          className={`
+            border-border
+            ring-1 ring-border
+            transition-all duration-300
+            ${neonRings[index]}
+          `}
+        >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
@@ -43,6 +58,7 @@ export function StatsCards({ onLoaded }) {
                   {stat.value}
                 </p>
               </div>
+
               <div className="w-12 h-12 bg-secondary rounded-md flex items-center justify-center">
                 <stat.icon className="w-6 h-6 text-secondary-foreground" />
               </div>

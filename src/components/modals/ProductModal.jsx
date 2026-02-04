@@ -93,6 +93,18 @@ export function ProductModal({
     }));
   }
 
+  useEffect(() => {
+    if (abierto) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [abierto]);
+
   async function handleGuardarClick() {
     setLoading(true);
     if (form.nombre.trim() === "") {
@@ -147,19 +159,18 @@ export function ProductModal({
     <Dialog open={abierto} onOpenChange={onCerrar}>
       <DialogContent
         className="
-        w-[95vw]
-        sm:max-w-lg
-        h-[90vh]
-        max-h-[90vh]
-        bg-white
-        rounded-2xl
-        border
-        shadow-lg
-        p-0
-        flex
-        flex-col
-        overflow-hidden
-      "
+    w-[95vw]
+    sm:max-w-lg
+    max-h-[90vh]
+    bg-white
+    rounded-2xl
+    border
+    shadow-lg
+    p-0
+    flex
+    flex-col
+    overflow-hidden
+  "
       >
         {/* ---------- HEADER ---------- */}
         <DialogHeader className="px-6 pt-6 shrink-0">

@@ -35,6 +35,12 @@ export function Transferencias() {
   const totalCantidadTransferencias =
     resumen?.transferencias.reduce((a, b) => a + b.cantidad, 0) ?? 0;
 
+  const rings = [
+    "ring-2 ring-blue-500/40", // Azul
+    "ring-2 ring-red-500/40", // Rojo
+    "ring-2 ring-yellow-400/40", // Amarillo
+  ];
+
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 lg:px-6 py-6 space-y-6">
@@ -62,14 +68,14 @@ export function Transferencias() {
 
         {/* MÉTRICAS PRINCIPALES */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Card className="p-4">
+          <Card className={`p-4 border-border ${rings[0]}`}>
             <p className="text-sm text-muted-foreground">Total ingresos</p>
             <p className="text-2xl font-semibold">
               ${resumen?.totalGeneral.toLocaleString() ?? "-"}
             </p>
           </Card>
 
-          <Card className="p-4">
+          <Card className={`p-4 border-border ${rings[1]}`}>
             <p className="text-sm text-muted-foreground">
               Ingresos en efectivo
             </p>
@@ -81,7 +87,7 @@ export function Transferencias() {
             </p>
           </Card>
 
-          <Card className="p-4">
+          <Card className={`p-4 border-border ${rings[2]}`}>
             <p className="text-sm text-muted-foreground">
               Ingresos por transferencia
             </p>
