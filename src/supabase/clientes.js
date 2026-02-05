@@ -100,6 +100,38 @@ export async function getComprasCliente(idCliente) {
   return data;
 }
 
+export async function getCompraById(idCompra) {
+  const { data, error } = await supabase
+    .from("compra")
+    .select(
+      `
+      id,
+      fecha,
+      monto_total,
+
+      empleados (
+        nombre,
+        apellido
+      ),
+
+      compra_producto (
+        id,
+        monto,
+        estado_pago,
+        cantidad,
+        producto (
+          nombre
+        )
+      )
+    `,
+    )
+    .eq("id", idCompra)
+    .single(); // 👈 importante
+
+  if (error) throw error;
+  return data;
+}
+
 export async function getCuotasVencidas() {
   const { data, error } = await supabase
     .from("cuota")

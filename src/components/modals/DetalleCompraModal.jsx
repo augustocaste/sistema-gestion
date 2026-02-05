@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,25 +14,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import {
   obtenerPlanCuotasPorProducto,
   getCuotasPorPlan,
+  getCompraById,
 } from "@/supabase/clientes";
 import { PlanPagosModal } from "@/components/modals/PlanPagosModal.jsx";
 
-export function DetalleCompraModal({ abierto, onCerrar, compra }) {
+export function DetalleCompraModal({
+  abierto,
+  onCerrar,
+  compra,
+  actualizarCompraEnLista, // callback del padre
+}) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [planTotal, setPlanTotal] = useState(null);
-  console.log(compra);
-  if (!compra) return null;
+  const [compraActual, setCompraActual] = useState(compra);
 
+  // 🔄 Mantener sincronizada la compra cuando cambia la prop
+  useEffect(() => {
+    setCompraActual(compra);
+  }, [compra]);
+
+  if (!compraActual) return null;
+
+  // Abrir PlanPagosModal
   async function handleClick(compraProducto) {
     try {
       const plan = await obtenerPlanCuotasPorProducto(compraProducto.id);
-
       const cuotas = await getCuotasPorPlan(plan.id);
 
       setPlanTotal({
@@ -45,36 +56,52 @@ export function DetalleCompraModal({ abierto, onCerrar, compra }) {
     }
   }
 
+  // 🔄 Se llama al cerrar PlanPagosModal
+  async function handleCerrarPlanPagos() {
+    setModalAbierto(false);
+
+    if (!planTotal) return;
+
+    try {
+      // 1️⃣ Recargar la compra actual desde Supabase
+      const compraActualizada = await getCompraById(compraActual.id);
+      setCompraActual(compraActualizada);
+
+      // 2️⃣ Actualizar la compra en la lista del padre
+      if (actualizarCompraEnLista) {
+        actualizarCompraEnLista(compraActualizada);
+      }
+    } catch (error) {
+      console.error("Error al actualizar compra:", error);
+    }
+  }
+
   return (
     <Dialog open={abierto} onOpenChange={onCerrar}>
       <DialogContent
         className="
-    max-h-[80vh]
-    overflow-y-auto
-    overflow-x-hidden
-    w-full
-    md:max-w-4xl
-  "
+          max-h-[80vh]
+          overflow-y-auto
+          overflow-x-hidden
+          w-full
+          md:max-w-4xl
+        "
       >
         <DialogHeader>
-          <DialogTitle>Compra #{compra.id}</DialogTitle>
+          <DialogTitle>Información de la compra</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 text-sm">
           <div className="flex justify-between">
             <span>Fecha</span>
-            <span>{compra.fecha}</span>
-          </div>
-
-          <div className="flex justify-between">
-            <span>Monto total</span>
-            <span className="font-medium">${compra.monto_total}</span>
+            <span>{compraActual.fecha}</span>
           </div>
 
           <div className="flex justify-between">
             <span>Empleado</span>
             <span>
-              {compra.empleados?.nombre} {compra.empleados?.apellido}
+              {compraActual.empleados?.nombre}{" "}
+              {compraActual.empleados?.apellido}
             </span>
           </div>
 
@@ -96,16 +123,14 @@ export function DetalleCompraModal({ abierto, onCerrar, compra }) {
                 </TableHeader>
 
                 <TableBody>
-                  {compra.compra_producto.map((p) => (
+                  {compraActual.compra_producto.map((p) => (
                     <TableRow key={p.id}>
                       <TableCell>{p.producto.nombre}</TableCell>
-
                       <TableCell className="text-right">${p.monto}</TableCell>
                       <TableCell className="text-right">{p.cantidad}</TableCell>
                       <TableCell className="text-right">
                         <Badge variant="outline">{p.estado_pago}</Badge>
                       </TableCell>
-
                       <TableCell className="text-right">
                         {p.estado_pago === "No completado" && (
                           <Button
@@ -125,7 +150,7 @@ export function DetalleCompraModal({ abierto, onCerrar, compra }) {
 
             {/* CARDS (mobile) */}
             <div className="space-y-3 md:hidden">
-              {compra.compra_producto.map((p) => (
+              {compraActual.compra_producto.map((p) => (
                 <div key={p.id} className="rounded-lg border p-3 space-y-2">
                   <div className="font-medium">{p.producto.nombre}</div>
 
@@ -157,9 +182,11 @@ export function DetalleCompraModal({ abierto, onCerrar, compra }) {
           </div>
         </div>
       </DialogContent>
+
+      {/* PlanPagosModal */}
       <PlanPagosModal
         abierto={modalAbierto}
-        onCerrar={() => setModalAbierto(false)}
+        onCerrar={handleCerrarPlanPagos}
         plan={planTotal}
       />
     </Dialog>

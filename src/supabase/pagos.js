@@ -78,6 +78,14 @@ export async function verificarYCompletarPlan(planCuotasId) {
 
   if (planError) throw planError;
 
+  // 4️⃣ Eliminar todas las cuotas del plan
+  const { error: deleteError } = await supabase
+    .from("cuota")
+    .delete()
+    .eq("id_plan_cuotas", planCuotasId);
+
+  if (deleteError) throw deleteError;
+
   return {
     ok: true,
     completado: true,

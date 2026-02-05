@@ -25,8 +25,9 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
 
   const producto = factura.producto;
   const compra = factura.compra;
+  const cantCuotas = factura.plan_cuotas.cant_cuotas;
   const cuotas = factura.plan_cuotas?.cuota ?? [];
-  const esCuotas = cuotas.length > 1;
+  const esCuotas = cantCuotas > 1;
 
   const clienteNombre = compra?.cliente
     ? `${compra.cliente.nombre} ${compra.cliente.apellido}`
@@ -253,7 +254,7 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
                 textAlign: "center",
               }}
             >
-              {esCuotas ? `${cuotas.length} cuotas` : "Contado"}
+              {esCuotas ? `${cantCuotas} cuotas` : "Contado"}
             </td>
             <td
               style={{
@@ -295,9 +296,7 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
           <div style={{ marginBottom: "16px", fontSize: "14px" }}>
             <p style={{ margin: 0 }}>
               Plan de pago:{" "}
-              <strong>
-                {esCuotas ? `${cuotas.length} cuotas` : "Contado"}
-              </strong>
+              <strong>{esCuotas ? `${cantCuotas} cuotas` : "Contado"}</strong>
             </p>
           </div>
 
@@ -420,7 +419,7 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
           </div>
 
           {/* CUOTAS */}
-          {esCuotas && (
+          {esCuotas && cuotas.length > 1 && (
             <div style={{ marginTop: "16px" }}>
               <h4
                 style={{

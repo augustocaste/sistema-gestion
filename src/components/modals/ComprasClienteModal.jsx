@@ -19,23 +19,32 @@ export function ComprasClienteModal({ abierto, onCerrar, cliente }) {
   const [facturasAbierto, setFacturasAbierto] = useState(false);
   const [compraFacturas, setCompraFacturas] = useState(null);
 
+  // 🔄 Traer compras
+  async function fetchCompras() {
+    if (!cliente?.id) return;
+    setLoading(true);
+    try {
+      const data = await getComprasCliente(cliente.id);
+      setCompras(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ⚡ Se dispara al abrir o cambiar cliente
   useEffect(() => {
     if (!abierto || !cliente) return;
-
-    async function fetchCompras() {
-      setLoading(true);
-      try {
-        const data = await getComprasCliente(cliente.id);
-        setCompras(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchCompras();
   }, [abierto, cliente]);
+
+  // 🔄 Actualizar solo la compra modificada en la lista
+  function actualizarCompraEnLista(compraActualizada) {
+    setCompras((prev) =>
+      prev.map((c) => (c.id === compraActualizada.id ? compraActualizada : c)),
+    );
+  }
 
   return (
     <Dialog open={abierto} onOpenChange={onCerrar}>
@@ -43,7 +52,7 @@ export function ComprasClienteModal({ abierto, onCerrar, cliente }) {
         className="
           w-[95vw]
           sm:max-w-2xl
-          max-h-[90vh]   /* 👈 límite de altura */
+          max-h-[90vh]
           flex
           flex-col
         "
@@ -54,7 +63,6 @@ export function ComprasClienteModal({ abierto, onCerrar, cliente }) {
           </DialogTitle>
         </DialogHeader>
 
-        {/* ===== CONTENIDO SCROLLEABLE ===== */}
         <div className="flex-1 overflow-y-auto pr-1">
           {loading ? (
             <p className="text-sm text-muted-foreground">Cargando compras...</p>
@@ -64,59 +72,89 @@ export function ComprasClienteModal({ abierto, onCerrar, cliente }) {
             </p>
           ) : (
             <div className="space-y-2">
-              {compras.map((compra) => (
-                <div
-                  key={compra.id}
-                  className="border rounded-md p-3 space-y-2"
-                >
-                  <button
-                    onClick={() => {
-                      setCompraSeleccionada(compra);
-                      setDetalleAbierto(true);
-                    }}
-                    className="w-full text-left hover:bg-muted transition rounded-md p-2"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">Compra #{compra.id}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {compra.fecha}
-                      </span>
-                    </div>
+              {compras.map((compra) => {
+                const todasCompletadas = compra.compra_producto?.every(
+                  (cp) => cp.estado_pago === "Completado",
+                );
 
-                    <div className="text-sm text-muted-foreground mt-1">
-                      Total: ${compra.monto_total}
-                    </div>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setCompraFacturas(compra);
-                      setFacturasAbierto(true);
-                    }}
-                    className="
-                      w-full
-                      text-sm
-                      border
-                      rounded-md
-                      py-2
-                      hover:bg-muted
-                      transition
-                    "
+                return (
+                  <div
+                    key={compra.id}
+                    className="border rounded-md p-3 space-y-2"
                   >
-                    Ver facturas
-                  </button>
-                </div>
-              ))}
+                    <button
+                      onClick={() => {
+                        setCompraSeleccionada(compra);
+                        setDetalleAbierto(true);
+                      }}
+                      className="w-full text-left hover:bg-muted transition rounded-md p-2"
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">
+                          Fecha: {compra.fecha}
+                        </span>
+                      </div>
+
+                      <div className="text-sm text-muted-foreground mt-1">
+                        Total: ${compra.monto_total}
+                      </div>
+                    </button>
+
+                    {todasCompletadas && (
+                      <div
+                        className="
+                          w-full
+                          text-sm
+                          text-green-600
+                          font-medium
+                          border
+                          border-green-500/30
+                          bg-green-500/10
+                          rounded-md
+                          py-2
+                          text-center
+                        "
+                      >
+                        Compra pagada
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => {
+                        setCompraFacturas(compra);
+                        setFacturasAbierto(true);
+                      }}
+                      className="
+                          w-full
+                          text-sm
+                          border
+                          rounded-md
+                          py-2
+                          hover:bg-muted
+                          transition
+                        "
+                    >
+                      Ver facturas
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
       </DialogContent>
 
-      {/* ===== MODALES HIJOS ===== */}
+      {/* MODALES HIJOS */}
       <DetalleCompraModal
         abierto={detalleAbierto}
-        onCerrar={() => setDetalleAbierto(false)}
+        onCerrar={() => {
+          setDetalleAbierto(false);
+          setCompraSeleccionada(null);
+          setCompraFacturas(null);
+          setFacturasAbierto(false);
+        }}
         compra={compraSeleccionada}
+        actualizarCompraEnLista={actualizarCompraEnLista} // ✅ aquí
       />
 
       <FacturaModal

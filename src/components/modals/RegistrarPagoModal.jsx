@@ -66,7 +66,7 @@ export function RegistrarPagoModal({ abierto, onCerrar, cuota, tipo, plan }) {
     if (form.monto > deuda) {
       toast.error(
         "El monto del adelanto no puede exceder el monto restante de la cuota que es " +
-          deuda
+          deuda,
       );
       return;
     }
