@@ -16,7 +16,10 @@ const PhoneIcon = () => (
   </svg>
 );
 
-export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
+export const Factura = forwardRef(function Factura(
+  { factura, onPrint, id },
+  ref,
+) {
   const garantia =
     factura.producto.garantia == 0 ? false : factura.producto.garantia;
   const [garantiaMeses, setGarantiaMeses] = useState(garantia || "");
@@ -41,6 +44,7 @@ export const Factura = forwardRef(function Factura({ factura, onPrint }, ref) {
   return (
     <div
       ref={ref}
+      id={id} // <--- importante para html2canvas
       style={{
         maxWidth: "210mm",
         margin: "0 auto",

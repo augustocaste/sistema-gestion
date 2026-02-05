@@ -36,76 +36,61 @@ export function FacturasCompra({ facturas }) {
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        backgroundColor: "#ffffff", // obligatorio para no tener transparencia
+        backgroundColor: "#ffffff",
       });
-
       const base64 = canvas.toDataURL("image/png").split(",")[1];
       if (!base64) throw new Error("No se pudo generar base64 correctamente");
       return base64;
     } catch (error) {
       console.error("Error al generar imagen base64:", error);
-      return null; // Devolver null si la generación falla
+      return null;
     }
   }
 
   async function generarPDF(facturas) {
-    const doc = new jsPDF();
+    const doc = new jsPDF("p", "mm", "a4"); // vertical, mm, A4
 
     for (let index = 0; index < facturas.length; index++) {
       const factura = facturas[index];
-
-      // Selecciona el elemento de la factura
       const facturaElemento = document.getElementById(`factura-${factura.id}`);
+      if (!facturaElemento) continue;
 
-      if (!facturaElemento) {
-        console.error("Factura no encontrada para el ID:", factura.id);
-        continue;
-      }
+      await new Promise((r) => setTimeout(r, 50));
 
-      // Espera a que la imagen base64 de cada factura sea generada
-      const base64 = await generarImagenBase64(facturaElemento);
+      const canvas = await html2canvas(facturaElemento, {
+        scale: 1.5, // reduce tamaño
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
 
-      // Si no se pudo generar la imagen base64, continuar con la siguiente factura
-      if (!base64) {
-        console.error(
-          "No se pudo generar la imagen para la factura ID:",
-          factura.id,
-        );
-        continue;
-      }
+      // Convertir a JPEG comprimido
+      const base64 = canvas.toDataURL("image/jpeg", 0.7).split(",")[1];
 
-      // Agregar la imagen al PDF
-      doc.addImage(base64, "PNG", 10, 10, 180, 260);
+      const pdfWidth = 210; // ancho A4 en mm
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // mantiene proporción
 
-      // Si no es la última factura, agregar una nueva página
-      if (index < facturas.length - 1) {
-        doc.addPage();
-      }
+      doc.addImage(base64, "JPEG", 0, 0, pdfWidth, pdfHeight);
+
+      if (index < facturas.length - 1) doc.addPage();
     }
 
-    // Generar el PDF como ArrayBuffer para su posterior uso
     return doc.output("arraybuffer");
   }
 
-  // Función para convertir ArrayBuffer a Base64
   function arrayBufferToBase64(buffer) {
     let binary = "";
     const bytes = new Uint8Array(buffer);
-
     for (let i = 0; i < bytes.length; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
-
-    return window.btoa(binary); // 🔥 BASE64 PURO
+    return window.btoa(binary);
   }
 
-  // Función para subir el archivo a Backblaze
   async function subirArchivoABackblaze({ fileBuffer, filename, mime }) {
     try {
       if (!fileBuffer || fileBuffer.length === 0) {
         throw new Error("El archivo no contiene datos válidos.");
       }
-
       const res = await fetch(
         "https://czpqppndnonhhxjynkkm.supabase.co/functions/v1/subir-factura",
         {
@@ -118,10 +103,9 @@ export function FacturasCompra({ facturas }) {
           }),
         },
       );
-
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || "Error al subir");
-      return data.url; // URL pública del archivo
+      return data.url;
     } catch (err) {
       console.error("Error al subir archivo:", err);
       throw err;
@@ -133,12 +117,10 @@ export function FacturasCompra({ facturas }) {
      ====================== */
   async function compartirWhatsApp() {
     if (!facturaSeleccionada) return;
-
     try {
       setLoadingWsp(true);
       const telefono = `+549${facturaSeleccionada.compra.cliente.telefono}`;
       const nombre = facturaSeleccionada.compra.cliente.nombre;
-
       const base64 = await generarImagenBase64(facturaVisibleRef.current);
       const url = await subirArchivoABackblaze({
         fileBuffer: base64,
@@ -164,25 +146,17 @@ export function FacturasCompra({ facturas }) {
   async function compartirTodasWhatsApp() {
     try {
       setLoadingWsp(true);
-
-      // 1. Generar PDF
       const pdfArrayBuffer = await generarPDF(facturas);
-
-      // 2. Convertir a base64 PURO (clave)
       const pdfBase64 = arrayBufferToBase64(pdfArrayBuffer);
-
-      // 3. Subir a Backblaze
       const url = await subirArchivoABackblaze({
         fileBuffer: pdfBase64,
         filename: `facturas-${Date.now()}.pdf`,
         mime: "application/pdf",
       });
-
-      // 4. Enviar por WhatsApp
+      console.log("URL del PDF subido:", url);
       const texto = encodeURIComponent(
-        `Hola 👋\nTe envío las facturas en PDF:\n${url}`,
+        `Hola, \nte envío las facturas en PDF:\n${url}`,
       );
-
       window.open(`https://wa.me/?text=${texto}`, "_blank");
     } catch (e) {
       console.error("Error al compartir las facturas:", e);
@@ -230,8 +204,19 @@ export function FacturasCompra({ facturas }) {
         </div>
       )}
 
-      {/* TODAS LAS FACTURAS (OCULTO PARA IMPRESIÓN/GENERO IMAGEN) */}
-      <div ref={facturasTodasRef} className="hidden print:block">
+      {/* TODAS LAS FACTURAS (RENDER INVISIBLE PERO MEDIBLE) */}
+      <div
+        ref={facturasTodasRef}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "210mm",
+          backgroundColor: "#fff",
+          opacity: 0,
+          pointerEvents: "none",
+        }}
+      >
         {facturas.map((f) => (
           <Factura key={f.id} factura={f} id={`factura-${f.id}`} />
         ))}

@@ -132,15 +132,13 @@ export function DetalleCompraModal({
                         <Badge variant="outline">{p.estado_pago}</Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        {p.estado_pago === "No completado" && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleClick(p)}
-                          >
-                            Ver plan de pagos
-                          </Button>
-                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleClick(p)}
+                        >
+                          Ver plan de pagos
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -153,12 +151,10 @@ export function DetalleCompraModal({
               {compraActual.compra_producto.map((p) => (
                 <div key={p.id} className="rounded-lg border p-3 space-y-2">
                   <div className="font-medium">{p.producto.nombre}</div>
-
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>Monto</span>
                     <span>${p.monto}</span>
                   </div>
-
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-muted-foreground">
                       Estado de pago
@@ -166,16 +162,14 @@ export function DetalleCompraModal({
                     <Badge variant="outline">{p.estado_pago}</Badge>
                   </div>
 
-                  {p.estado_pago === "No completado" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full mt-2"
-                      onClick={() => handleClick(p)}
-                    >
-                      Ver plan de pagos
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={() => handleClick(p)}
+                  >
+                    Ver plan de pagos
+                  </Button>
                 </div>
               ))}
             </div>
