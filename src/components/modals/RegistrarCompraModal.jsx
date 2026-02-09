@@ -38,6 +38,7 @@ export function RegistrarCompraModal({ open, onClose }) {
   const [searchCliente, setSearchCliente] = useState("");
   const [clientes, setClientes] = useState([]);
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
+  const [clienteBloqueado, setClienteBloqueado] = useState(false);
 
   const [modalAbiertoCliente, setModalAbiertoCliente] = useState(false);
   const [cliente, setCliente] = useState(null);
@@ -107,13 +108,15 @@ export function RegistrarCompraModal({ open, onClose }) {
   }, [open]);
 
   useEffect(() => {
+    if (clienteBloqueado) return;
+
     if (searchCliente.length < 3) {
       setClientes([]);
       return;
     }
 
     buscarClientes(searchCliente).then(({ data }) => setClientes(data ?? []));
-  }, [searchCliente]);
+  }, [searchCliente, clienteBloqueado]);
 
   useEffect(() => {
     if (search.trim().length < 3) {
@@ -270,7 +273,10 @@ export function RegistrarCompraModal({ open, onClose }) {
               <Input
                 placeholder="Buscar cliente..."
                 value={searchCliente}
-                onChange={(e) => setSearchCliente(e.target.value)}
+                onChange={(e) => {
+                  setSearchCliente(e.target.value);
+                  setClienteBloqueado(false);
+                }}
               />
 
               <Button
@@ -294,8 +300,9 @@ export function RegistrarCompraModal({ open, onClose }) {
                     size="sm"
                     onClick={() => {
                       setClienteSeleccionado(c);
-                      setClientes([]);
                       setSearchCliente(c.nombre_completo);
+                      setClientes([]);
+                      setClienteBloqueado(true);
                     }}
                   >
                     Seleccionar

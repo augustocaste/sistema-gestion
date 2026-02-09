@@ -28,6 +28,7 @@ export function PlanPagosModal({ abierto, onCerrar, plan }) {
     if (!plan?.id) return;
     console.log("Cargando cuotas para el plan:", plan);
     getCuotasPorPlan(plan.id).then(setCuotas);
+    console.log(cuotas);
   }, [plan]);
 
   return (
