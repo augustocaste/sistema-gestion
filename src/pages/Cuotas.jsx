@@ -31,6 +31,11 @@ export function Cuotas() {
   const [total, setTotal] = useState(0);
   const totalPaginas = Math.ceil(total / pageSize);
 
+  function parseFechaLocal(fecha) {
+    const [y, m, d] = fecha.split("-");
+    return new Date(y, m - 1, d);
+  }
+
   async function fetchCuotas(page = pagina) {
     setLoading(true);
     try {
@@ -153,7 +158,11 @@ export function Cuotas() {
                           {cliente.nombre_completo}
                         </TableCell>
                         <TableCell>{cp?.producto?.nombre}</TableCell>
-                        <TableCell>{cuota.fecha_vencimiento}</TableCell>
+                        <TableCell>
+                          {parseFechaLocal(
+                            cuota.fecha_vencimiento,
+                          ).toLocaleDateString("es-AR")}
+                        </TableCell>
                         <TableCell>
                           <Badge
                             variant={
@@ -203,7 +212,11 @@ export function Cuotas() {
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">{cuota.fecha_vencimiento}</span>
+                      <span className="text-sm">
+                        {parseFechaLocal(
+                          cuota.fecha_vencimiento,
+                        ).toLocaleDateString("es-AR")}
+                      </span>
 
                       <Badge
                         variant={
