@@ -15,6 +15,8 @@ export function FacturasCompra({ facturas }) {
   const facturaVisibleRef = useRef(null);
   const facturasTodasRef = useRef(null);
 
+  const facturasPrintRef = useRef(null);
+
   /* ======================
      IMPRESIÓN
      ====================== */
@@ -24,7 +26,7 @@ export function FacturasCompra({ facturas }) {
   });
 
   const imprimirTodas = useReactToPrint({
-    contentRef: facturasTodasRef,
+    contentRef: facturasPrintRef,
     documentTitle: "Facturas compra",
   });
 
@@ -216,6 +218,13 @@ export function FacturasCompra({ facturas }) {
       >
         {facturas.map((f) => (
           <Factura key={f.id} factura={f} id={`factura-${f.id}`} />
+        ))}
+      </div>
+
+      {/* CONTENEDOR SOLO PARA IMPRESIÓN */}
+      <div className="hidden print:block" ref={facturasPrintRef}>
+        {facturas.map((f) => (
+          <Factura key={`print-${f.id}`} factura={f} />
         ))}
       </div>
 
