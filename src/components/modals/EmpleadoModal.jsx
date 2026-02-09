@@ -13,7 +13,7 @@ import { toast } from "sonner";
 export function EmpleadoModal({
   abierto,
   onCerrar,
-  trabajador = null,
+  empleado = null,
   onGuardar,
   modo = "crear", // crear | editar
 }) {
@@ -30,14 +30,14 @@ export function EmpleadoModal({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (trabajador) {
+    if (modo === "editar" && empleado) {
       setForm({
-        nombre: trabajador.nombre || "",
-        apellido: trabajador.apellido || "",
-        dni: trabajador.dni || "",
-        rol: trabajador.rol || "empleado",
-        activo: trabajador.activo ?? true,
-        email: trabajador.email || "",
+        nombre: empleado.nombre || "",
+        apellido: empleado.apellido || "",
+        dni: empleado.dni || "",
+        rol: empleado.rol || "empleado",
+        activo: empleado.activo ?? true,
+        email: empleado.email || "",
         password: "",
       });
     } else {
@@ -51,7 +51,7 @@ export function EmpleadoModal({
         password: "",
       });
     }
-  }, [trabajador, abierto]);
+  }, [empleado, modo, abierto]);
 
   function handleChange(e) {
     const { name, value, type, checked } = e.target;
@@ -67,13 +67,16 @@ export function EmpleadoModal({
       return;
     }
 
-    if (!form.email || !form.password) {
-      toast.error("Email y contraseña son obligatorios");
-      return;
-    }
-    if (form.password.length < 6) {
-      toast.error("La contraseña debe tener al menos 6 caracteres");
-      return;
+    if (modo === "crear") {
+      if (!form.email || !form.password) {
+        toast.error("Email y contraseña son obligatorios");
+        return;
+      }
+
+      if (form.password.length < 6) {
+        toast.error("La contraseña debe tener al menos 6 caracteres");
+        return;
+      }
     }
 
     setLoading(true);
@@ -82,18 +85,27 @@ export function EmpleadoModal({
       const payload = {
         ...form,
         dni: Number(form.dni),
-        email: form.email.toLowerCase().trim(),
+        email: form.email?.toLowerCase().trim(),
       };
 
       const result = await onGuardar(payload);
-      console.log(result);
-      console.log("Resultado de guardar empleado:", result);
-      if (!result?.ok) {
-        toast.error(result.error);
+      console.log("Resultado de onGuardar:", result);
+
+      if (result?.error?.code === "23505") {
+        toast.error("Ya existe un empleado con este DNI");
         return;
       }
 
-      toast.success("Trabajador registrado correctamente");
+      if (!result?.ok) {
+        toast.error(result?.error?.message || "Error al guardar");
+        return;
+      }
+
+      toast.success(
+        modo === "editar"
+          ? "Empleado actualizado"
+          : "Empleado registrado correctamente",
+      );
 
       onCerrar();
     } catch (error) {
@@ -116,7 +128,12 @@ export function EmpleadoModal({
         <div className="grid gap-4 py-4">
           <div>
             <label className="text-sm font-medium">Nombre</label>
-            <Input name="nombre" value={form.nombre} onChange={handleChange} />
+            <Input
+              name="nombre"
+              value={form.nombre}
+              onChange={handleChange}
+              placeholder="Ingrese el nombre"
+            />
           </div>
 
           <div>
@@ -125,6 +142,7 @@ export function EmpleadoModal({
               name="apellido"
               value={form.apellido}
               onChange={handleChange}
+              placeholder="Ingrese el apellido"
             />
           </div>
 
@@ -135,6 +153,7 @@ export function EmpleadoModal({
               name="dni"
               value={form.dni}
               onChange={handleChange}
+              placeholder="Ingrese el DNI"
             />
           </div>
 
@@ -151,15 +170,15 @@ export function EmpleadoModal({
             </select>
           </div>
 
-          <label className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2">
             <input
               type="checkbox"
               name="activo"
               checked={form.activo}
               onChange={handleChange}
             />
-            Activo
-          </label>
+            <label className="text-sm font-medium">Activo</label>
+          </div>
 
           {modo === "crear" && (
             <>
@@ -170,15 +189,18 @@ export function EmpleadoModal({
                   name="email"
                   value={form.email}
                   onChange={handleChange}
+                  placeholder="Ingrese el email"
                 />
               </div>
 
               <div>
                 <label className="text-sm font-medium">Contraseña</label>
                 <Input
+                  type="password"
                   name="password"
                   value={form.password}
                   onChange={handleChange}
+                  placeholder="Ingrese la contraseña"
                 />
               </div>
             </>

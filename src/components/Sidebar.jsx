@@ -14,6 +14,7 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Productos", href: "/productos", icon: Package },
   { name: "Clientes", href: "/clientes", icon: Users },
+  { name: "Trabajadores", href: "/trabajadores", icon: Users },
   { name: "Cuotas", href: "/cuotas", icon: CreditCard },
   { name: "Ingresos", href: "/transferencias", icon: Receipt },
 ];

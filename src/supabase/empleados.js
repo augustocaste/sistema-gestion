@@ -23,6 +23,7 @@ export async function buscarEmpleados(texto) {
   let query = supabase
     .from("empleados")
     .select("id, nombre, apellido")
+    .eq("activo", true)
     .limit(5);
   query = query.or(`nombre.ilike.%${texto}%,apellido.ilike.%${texto}%`);
 
