@@ -289,15 +289,13 @@ export function RegistrarCompraModal({ open, onClose }) {
                   key={c.id}
                   className="flex justify-between items-center border rounded-lg p-2"
                 >
-                  <span className="text-sm">
-                    {c.nombre} {c.apellido}
-                  </span>
+                  <span className="text-sm">{c.nombre_completo}</span>
                   <Button
                     size="sm"
                     onClick={() => {
                       setClienteSeleccionado(c);
                       setClientes([]);
-                      setSearchCliente(`${c.nombre} ${c.apellido}`);
+                      setSearchCliente(c.nombre_completo);
                     }}
                   >
                     Seleccionar

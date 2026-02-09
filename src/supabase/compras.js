@@ -48,8 +48,7 @@ export async function getFacturasByCompra(compraId) {
       compra (
         fecha,
         cliente: id_cliente (
-          nombre,
-          apellido,
+          nombre_completo,
           telefono
         )
       ),

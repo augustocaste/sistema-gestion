@@ -59,6 +59,13 @@ export function Cuotas() {
 
     return () => clearTimeout(timeout);
   }, [search, estado]);
+
+  useEffect(() => {
+    // Si no hay cuotas en la página actual y no es la primera
+    if (!loading && cuotas.length === 0 && pagina > 1) {
+      fetchCuotas(pagina - 1);
+    }
+  }, [cuotas, loading]);
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
@@ -143,7 +150,7 @@ export function Cuotas() {
                     return (
                       <TableRow key={cuota.id}>
                         <TableCell className="font-medium">
-                          {cliente.nombre} {cliente.apellido}
+                          {cliente.nombre_completo}
                         </TableCell>
                         <TableCell>{cp?.producto?.nombre}</TableCell>
                         <TableCell>{cuota.fecha_vencimiento}</TableCell>
@@ -189,9 +196,7 @@ export function Cuotas() {
                     className="border rounded-lg p-4 space-y-2"
                   >
                     <div>
-                      <p className="font-medium">
-                        {cliente.nombre} {cliente.apellido}
-                      </p>
+                      <p className="font-medium">{cliente.nombre_completo}</p>
                       <p className="text-sm text-muted-foreground">
                         Producto: {cp?.producto?.nombre}
                       </p>
@@ -264,7 +269,10 @@ export function Cuotas() {
         {/* MODAL PLAN */}
         <PlanPagosModal
           abierto={modalAbierto}
-          onCerrar={() => setModalAbierto(false)}
+          onCerrar={() => {
+            setModalAbierto(false);
+            fetchCuotas(pagina);
+          }}
           plan={planSeleccionado}
         />
       </div>

@@ -120,7 +120,6 @@ export function FacturasCompra({ facturas }) {
     try {
       setLoadingWsp(true);
       const telefono = `+549${facturaSeleccionada.compra.cliente.telefono}`;
-      const nombre = facturaSeleccionada.compra.cliente.nombre;
       const base64 = await generarImagenBase64(facturaVisibleRef.current);
       const url = await subirArchivoABackblaze({
         fileBuffer: base64,
@@ -128,9 +127,7 @@ export function FacturasCompra({ facturas }) {
         mime: "image/png",
       });
 
-      const texto = encodeURIComponent(
-        `Hola ${nombre}\nTe envío tu factura:\n${url}`,
-      );
+      const texto = encodeURIComponent(`Hola \nTe envío tu factura:\n${url}`);
       window.open(`https://wa.me/${telefono}?text=${texto}`, "_blank");
     } catch (e) {
       console.error(e);

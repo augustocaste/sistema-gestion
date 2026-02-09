@@ -186,10 +186,7 @@ export function Clientes() {
                       <TableCell className="max-w-[220px]">
                         <div className="flex flex-col">
                           <span className="font-medium truncate">
-                            {c.nombre}
-                          </span>
-                          <span className="text-xs text-muted-foreground truncate">
-                            {c.apellido}
+                            {c.nombre_completo}
                           </span>
                         </div>
                       </TableCell>

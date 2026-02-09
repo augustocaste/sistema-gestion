@@ -17,18 +17,18 @@ export function RecentActivity() {
   const [planSeleccionado, setPlanSeleccionado] = useState(null);
   const [modalAbierto, setModalAbierto] = useState(false);
 
-  useEffect(() => {
-    async function fetchCuotas() {
-      try {
-        const data = await getCuotasVencidas();
-        setCuotas(data ?? []);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+  const fetchCuotas = async () => {
+    try {
+      const data = await getCuotasVencidas();
+      setCuotas(data ?? []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchCuotas();
   }, []);
 
@@ -62,11 +62,11 @@ export function RecentActivity() {
               cuota.plan_cuotas.compra_producto[0].compra.clientes;
 
             const nombreCompleto = cliente
-              ? `${cliente.nombre} ${cliente.apellido}`
+              ? `${cliente.nombre_completo}`
               : "Cliente desconocido";
 
             const initials = cliente
-              ? `${cliente.nombre?.[0] ?? ""}${cliente.apellido?.[0] ?? ""}`
+              ? `${cliente.nombre_completo?.[0] ?? ""}`
               : "--";
 
             const mensaje = `tiene una cuota vencida en el pago de ${compraProducto.producto.nombre}`;
@@ -105,7 +105,10 @@ export function RecentActivity() {
       </CardContent>
       <PlanPagosModal
         abierto={modalAbierto}
-        onCerrar={() => setModalAbierto(false)}
+        onCerrar={() => {
+          setModalAbierto(false);
+          fetchCuotas();
+        }}
         plan={planSeleccionado}
       />
     </Card>

@@ -48,9 +48,6 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Mi cuenta</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuItem>Perfil</DropdownMenuItem>
-            <DropdownMenuItem>Configuración</DropdownMenuItem>
-            <DropdownMenuSeparator /> */}
             <DropdownMenuItem onClick={handleLogout}>
               Cerrar sesión
             </DropdownMenuItem>

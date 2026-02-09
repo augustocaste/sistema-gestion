@@ -58,9 +58,7 @@ export function ComprasClienteModal({ abierto, onCerrar, cliente }) {
         "
       >
         <DialogHeader>
-          <DialogTitle>
-            Compras de {cliente?.nombre} {cliente?.apellido}
-          </DialogTitle>
+          <DialogTitle>Compras de {cliente?.nombre_completo}</DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto pr-1">

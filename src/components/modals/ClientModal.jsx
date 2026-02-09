@@ -18,8 +18,7 @@ export function ClientModal({
   modo = "editar",
 }) {
   const [form, setForm] = useState({
-    nombre: "",
-    apellido: "",
+    nombre_completo: "",
     dni: 0,
     telefono: 0,
     direccion: "",
@@ -31,8 +30,7 @@ export function ClientModal({
   useEffect(() => {
     if (cliente) {
       setForm({
-        nombre: cliente.nombre || "",
-        apellido: cliente.apellido || "",
+        nombre_completo: cliente.nombre_completo || "",
         dni: cliente.dni || 0,
         telefono: cliente.telefono || 0,
         direccion: cliente.direccion || "",
@@ -40,8 +38,7 @@ export function ClientModal({
       });
     } else {
       setForm({
-        nombre: "",
-        apellido: "",
+        nombre_completo: "",
         dni: 0,
         telefono: 0,
         direccion: "",
@@ -60,8 +57,8 @@ export function ClientModal({
 
   async function handleGuardarClick() {
     setLoading(true);
-    if (form.nombre.trim() === "" || form.apellido.trim() === "") {
-      toast.error("El nombre y apellido del cliente son obligatorios");
+    if (form.nombre_completo.trim() === "") {
+      toast.error("El nombre completo del cliente es obligatorio");
       setLoading(false);
       return;
     }
@@ -76,7 +73,7 @@ export function ClientModal({
       if (!result?.ok) {
         if (result?.error?.code === "23505") {
           // Codigo de error de violación de unicidad
-          toast.error("Ya existe un cliente con este DNI");
+          toast.error("Ya existe un cliente con este DNI o nombre");
           return;
         }
         toast.error("Ocurrió un error al guardar el cliente");
@@ -86,7 +83,7 @@ export function ClientModal({
       toast.success(
         modo === "editar"
           ? "Cliente actualizado correctamente"
-          : "Cliente creado correctamente"
+          : "Cliente creado correctamente",
       );
 
       onCerrar();
@@ -113,23 +110,11 @@ export function ClientModal({
           <div>
             <label className="text-sm font-medium">Nombre</label>
             <Input
-              name="nombre"
-              placeholder="Ingrese el nombre del cliente"
-              value={form.nombre}
+              name="nombre_completo"
+              placeholder="Ingrese el nombre completo del cliente"
+              value={form.nombre_completo}
               onChange={(e) =>
-                setForm((p) => ({ ...p, nombre: e.target.value }))
-              }
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium">Apellido</label>
-            <Input
-              name="apellido"
-              placeholder="Ingrese el apellido del cliente"
-              value={form.apellido}
-              onChange={(e) =>
-                setForm((p) => ({ ...p, apellido: e.target.value }))
+                setForm((p) => ({ ...p, nombre_completo: e.target.value }))
               }
             />
           </div>
@@ -191,8 +176,8 @@ export function ClientModal({
             {loading
               ? "Guardando..."
               : modo === "editar"
-              ? "Guardar"
-              : "Agregar"}
+                ? "Guardar"
+                : "Agregar"}
           </Button>
         </DialogFooter>
       </DialogContent>

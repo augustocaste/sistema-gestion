@@ -1,39 +1,53 @@
 import { supabase } from "./client";
 
-// 🔹 Obtener todos los clientes, opcionalmente filtrando por nombre
 export async function getClientes(search = "", page = 1, pageSize = 10) {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
   let query = supabase
     .from("cliente")
-    .select("*", { count: "exact" }) // para obtener total de registros
+    .select("*", { count: "exact" })
     .eq("activo", true)
     .order("id", { ascending: true })
-    .range((page - 1) * pageSize, page * pageSize - 1);
+    .range(from, to);
 
   if (search) {
-    query = query.or(`nombre.ilike.%${search}%,apellido.ilike.%${search}%`);
+    query = query.ilike("nombre_completo", `%${search}%`);
   }
 
   const { data, error, count } = await query;
-
   if (error) throw error;
-  return { data, total: count };
+
+  return {
+    data: data ?? [],
+    total: count ?? 0,
+  };
 }
 
-export async function buscarClientes(texto) {
-  let query = supabase.from("cliente").select("id, nombre, apellido").limit(5);
-  query = query.or(`nombre.ilike.%${texto}%,apellido.ilike.%${texto}%`);
-  return await query;
+export async function buscarClientes(texto = "") {
+  if (!texto) return { data: [] };
+
+  const { data, error } = await supabase
+    .from("cliente")
+    .select("id, nombre_completo")
+    .ilike("nombre_completo", `%${texto}%`)
+    .eq("activo", true)
+    .order("nombre_completo", { ascending: true })
+    .limit(5);
+
+  if (error) throw error;
+
+  return { data };
 }
 
 // 🔹 Crear un cliente
 export async function createCliente(cliente) {
-  const { nombre, apellido, dni, telefono, direccion, observaciones } = cliente;
+  const { nombre_completo, dni, telefono, direccion, observaciones } = cliente;
   const { data, error } = await supabase
     .from("cliente")
     .insert([
       {
-        nombre,
-        apellido,
+        nombre_completo,
         dni,
         telefono,
         direccion,
@@ -151,8 +165,7 @@ export async function getCuotasVencidas() {
           compra (
             id,
             clientes:cliente (
-              nombre,
-              apellido
+              nombre_completo
             )
           ),
           producto (
@@ -221,7 +234,7 @@ async function buscarClientesIds(search) {
   const { data, error } = await supabase
     .from("cliente")
     .select("id")
-    .or(`nombre.ilike.%${search}%,apellido.ilike.%${search}%`);
+    .ilike("nombre_completo", `%${search}%`);
 
   if (error) throw error;
 
@@ -261,8 +274,7 @@ export async function getCuotas({ estado, search, page = 1, pageSize = 10 }) {
             id,
             cliente!inner (
               id,
-              nombre,
-              apellido
+              nombre_completo
             )
           ),
           producto (

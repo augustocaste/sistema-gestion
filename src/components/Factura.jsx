@@ -31,9 +31,9 @@ export const Factura = forwardRef(function Factura(
   const cantCuotas = factura.plan_cuotas.cant_cuotas;
   const cuotas = factura.plan_cuotas?.cuota ?? [];
   const esCuotas = cantCuotas > 1;
-
+  console.log(compra.cliente.nombre_completo);
   const clienteNombre = compra?.cliente
-    ? `${compra.cliente.nombre} ${compra.cliente.apellido}`
+    ? `${compra.cliente.nombre_completo}`
     : "Consumidor final";
 
   const fechaFactura = compra?.fecha ?? "";
