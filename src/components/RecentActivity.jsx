@@ -55,7 +55,6 @@ export function RecentActivity() {
 
         <div className="space-y-4 max-h-[320px] overflow-y-auto pr-1">
           {cuotas.map((cuota) => {
-            console.log(cuota);
             const compraProducto = cuota.plan_cuotas?.compra_producto?.[0];
 
             const cliente =

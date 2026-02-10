@@ -1,7 +1,6 @@
 import { supabase } from "./client";
 
 export async function updateCuota(dataPago, plan, cuota) {
-  console.log(dataPago);
   try {
     cuota.monto_actual_pagado += Number(dataPago.monto);
     if (cuota.monto_actual_pagado == plan.monto_cuota) {
@@ -58,7 +57,7 @@ export async function verificarYCompletarPlan(planCuotasId) {
   if (!cuotas || cuotas.length === 0) {
     throw new Error("El plan no tiene cuotas asociadas");
   }
-  console.log("Cuotas del plan:", cuotas);
+
   // 2️⃣ Verificar si TODAS están pagadas
   const todasPagadas = cuotas.every((cuota) => cuota.estado === "pagada");
 

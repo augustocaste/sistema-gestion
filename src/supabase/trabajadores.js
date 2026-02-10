@@ -25,9 +25,8 @@ export async function createEmpleado(empleado) {
     );
 
     const data = await res.json();
-    console.log("Respuesta de createEmpleado:", data);
+
     if (!data.ok) {
-      console.log("Error en createEmpleado:", data.message);
       return {
         ok: false,
         error: {
@@ -72,18 +71,43 @@ export async function getEmpleados(search = "", page = 1, pageSize = 10) {
 }
 
 export async function updateEmpleado(id, updates) {
-  // sacar campos que no pertenecen a la tabla empleados
-  const { email, password, ...safeUpdates } = updates;
+  try {
+    // sacar campos que no pertenecen a la tabla empleados
+    const { email, password, ...safeUpdates } = updates;
 
-  const { data, error } = await supabase
-    .from("empleados")
-    .update(safeUpdates)
-    .eq("id", id)
-    .select()
-    .single();
+    const { data, error } = await supabase
+      .from("empleados")
+      .update(safeUpdates)
+      .eq("id", id)
+      .select()
+      .single();
 
-  if (error) throw error;
-  return data;
+    if (error) {
+      // DNI duplicado
+      if (error.code === "23505") {
+        return {
+          ok: false,
+          error: { message: "Ya existe un empleado con ese DNI" },
+        };
+      }
+
+      // cualquier otro error de supabase
+      return {
+        ok: false,
+        error: { message: error.message },
+      };
+    }
+
+    return {
+      ok: true,
+      data,
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      error: { message: err.message },
+    };
+  }
 }
 
 export async function deleteEmpleado(id) {

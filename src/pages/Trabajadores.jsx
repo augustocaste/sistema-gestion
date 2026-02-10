@@ -70,12 +70,15 @@ export function Trabajadores() {
       } else {
         res = await createEmpleado(formData);
       }
-      console.log("Respuesta de guardar empleado:", res);
+
       setModalAbierto(false);
       fetchEmpleados(pagina, search);
       return res;
     } catch (error) {
-      return res;
+      return {
+        ok: false,
+        error: res,
+      };
     }
   }
 

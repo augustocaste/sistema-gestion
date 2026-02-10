@@ -12,7 +12,7 @@ import { RegistrarPagoModal } from "@/components/modals/RegistrarPagoModal";
 
 export function PlanPagosModal({ abierto, onCerrar, plan }) {
   if (!plan) return null;
-  console.log(plan);
+
   const [cuotas, setCuotas] = useState([]);
 
   function parseFechaLocal(fecha) {
@@ -26,9 +26,7 @@ export function PlanPagosModal({ abierto, onCerrar, plan }) {
 
   useEffect(() => {
     if (!plan?.id) return;
-    console.log("Cargando cuotas para el plan:", plan);
     getCuotasPorPlan(plan.id).then(setCuotas);
-    console.log(cuotas);
   }, [plan]);
 
   return (

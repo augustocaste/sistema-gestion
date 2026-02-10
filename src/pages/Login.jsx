@@ -13,7 +13,6 @@ export function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("Checking session for redirect...");
     const checkSession = async () => {
       const {
         data: { session },

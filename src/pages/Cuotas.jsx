@@ -45,7 +45,6 @@ export function Cuotas() {
         page,
         pageSize,
       });
-      console.log(data);
 
       setCuotas(data ?? []);
       setTotal(total ?? 0);

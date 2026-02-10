@@ -91,14 +91,13 @@ export function EmpleadoModal({
       };
 
       const result = await onGuardar(payload);
-      console.log("Resultado de onGuardar:", result);
 
       if (result?.error?.code === "23505") {
         toast.error("Ya existe un empleado con este DNI");
         return;
       }
 
-      if (!result?.ok) {
+      if (!result || !result.ok) {
         toast.error(result?.error?.message || "Error al guardar");
         return;
       }
