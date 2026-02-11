@@ -36,7 +36,7 @@ export function Login() {
       toast.success("Inicio de sesión exitoso");
       navigate("/", { replace: true });
     } catch (error) {
-      toast.error("Error al iniciar sesión: " + error.message);
+      toast.error("Error al iniciar sesión: Credenciales incorrectas");
     } finally {
       setLoading(false);
     }
