@@ -152,7 +152,7 @@ export function FacturasCompra({ facturas }) {
         filename: `facturas-${Date.now()}.pdf`,
         mime: "application/pdf",
       });
-      console.log("URL del PDF subido:", url);
+
       const texto = encodeURIComponent(
         `Hola, \nte envío las facturas en PDF:\n${url}`,
       );

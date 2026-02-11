@@ -205,21 +205,21 @@ export function RegistrarCompraModal({ open, onClose }) {
       return toast.error("Faltan datos obligatorios");
     }
     for (const p of seleccionados) {
+      console.log(p.medio_contado);
       if (p.tipo_pago === "contado") {
         if (!p.medio_contado) {
           return toast.error(
             `Elegí el medio de pago para el producto "${p.nombre}"`,
           );
         }
-
-        if (
-          p.medio_contado === "transferencia" &&
-          (!p.alias || p.alias.trim() === "")
-        ) {
-          return toast.error(
-            `Ingresá el alias de la transferencia para "${p.nombre}"`,
-          );
-        }
+      }
+      if (
+        p.medio_contado === "transferencia" &&
+        (!p.alias || p.alias.trim() === "")
+      ) {
+        return toast.error(
+          `Ingresá el alias de la transferencia para "${p.nombre}"`,
+        );
       }
     }
 
