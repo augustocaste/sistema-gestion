@@ -106,7 +106,7 @@ export function Transferencias() {
             <h2 className="font-semibold text-sm">Transferencias por alias</h2>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
             <Table>
               <TableHeader>
                 <TableRow>
