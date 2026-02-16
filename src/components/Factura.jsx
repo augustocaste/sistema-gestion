@@ -21,8 +21,8 @@ export const Factura = forwardRef(function Factura(
   ref,
 ) {
   const garantia =
-    factura.producto.garantia == 0 ? false : factura.producto.garantia;
-  const [garantiaMeses, setGarantiaMeses] = useState(garantia || "");
+    factura.producto.garantia == 0 ? 0 : factura.producto.garantia;
+  const [garantiaMeses, setGarantiaMeses] = useState(garantia || "S/N");
 
   if (!factura) return null;
 
