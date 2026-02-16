@@ -405,7 +405,7 @@ export const Factura = forwardRef(function Factura(
             >
               <span style={{ fontSize: "14px" }}>Subtotal</span>
               <span style={{ fontSize: "14px" }}>
-                $ {total.toLocaleString("es-AR")}
+                $ {factura.plan_cuotas.monto_cuota.toLocaleString("es-AR")}
               </span>
             </div>
 
@@ -420,7 +420,10 @@ export const Factura = forwardRef(function Factura(
               }}
             >
               <span>TOTAL</span>
-              <span>$ {total.toLocaleString("es-AR")}</span>
+              <span>
+                {" "}
+                $ {factura.plan_cuotas.monto_cuota.toLocaleString("es-AR")}
+              </span>
             </div>
           </div>
 
