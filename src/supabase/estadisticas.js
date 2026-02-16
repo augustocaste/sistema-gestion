@@ -41,11 +41,21 @@ export async function getVentasDelMes() {
   return data.reduce((acc, venta) => acc + (venta.monto_total ?? 0), 0);
 }
 
-export async function getCantidadEmpleados() {
+export async function getTotalInvertidoStock() {
   const { data, error } = await supabase
-    .from("empleados")
-    .select("id", { count: "exact" })
+    .from("producto")
+    .select("stock, precio_contado")
     .eq("activo", true);
-  if (error) throw error;
-  return data.length;
+
+  if (error) {
+    console.error("Error calculando total invertido:", error);
+    return "0";
+  }
+
+  const total = data.reduce(
+    (acc, prod) => acc + (prod.stock ?? 0) * (prod.precio_contado ?? 0),
+    0,
+  );
+
+  return total.toLocaleString("es-AR");
 }

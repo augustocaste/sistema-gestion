@@ -201,7 +201,7 @@ export function ProductModal({
               <Input
                 type="number"
                 name="precio_contado"
-                placeholder="Ingrese un valor numérico"
+                placeholder="Ingrese el precio al contado"
                 value={form.precio_contado === 0 ? "" : form.precio_contado}
                 onChange={handleChange}
               />
@@ -213,7 +213,7 @@ export function ProductModal({
               <Input
                 type="number"
                 name="stock"
-                placeholder="Ingrese un valor numérico"
+                placeholder="Ingrese el stock"
                 value={form.stock === 0 ? "" : form.stock}
                 onChange={handleChange}
               />
@@ -253,11 +253,13 @@ export function ProductModal({
             {CUOTAS_CONFIG.filter((c) => form.cantidad_cuotas >= c.value).map(
               (cuota) => (
                 <div key={cuota.name}>
-                  <label className="text-sm font-medium">{cuota.label}</label>
+                  <label className="text-sm font-medium">
+                    Precio final en {cuota.label}
+                  </label>
                   <Input
                     type="number"
                     name={cuota.name}
-                    placeholder="Ingrese un valor numérico"
+                    placeholder="Ingrese el precio final en estas cuotas"
                     value={form[cuota.name] === 0 ? "" : form[cuota.name]}
                     onChange={handleChange}
                   />

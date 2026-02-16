@@ -258,7 +258,9 @@ export const Factura = forwardRef(function Factura(
                 textAlign: "center",
               }}
             >
-              {esCuotas ? `${cantCuotas} cuotas` : "Contado"}
+              {esCuotas
+                ? `${cuotas.filter((c) => c.estado === "pagada").length} de ${cantCuotas}`
+                : "Contado"}
             </td>
             <td
               style={{
@@ -267,7 +269,7 @@ export const Factura = forwardRef(function Factura(
                 textAlign: "center",
               }}
             >
-              $ {precioUnitario.toLocaleString("es-AR")}
+              $ {factura.plan_cuotas.monto_cuota.toLocaleString("es-AR")}
             </td>
             <td
               style={{
@@ -277,7 +279,7 @@ export const Factura = forwardRef(function Factura(
                 fontWeight: "bold",
               }}
             >
-              $ {total.toLocaleString("es-AR")}
+              $ {factura.plan_cuotas.monto_cuota.toLocaleString("es-AR")}
             </td>
           </tr>
         </tbody>

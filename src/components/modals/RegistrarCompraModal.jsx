@@ -59,7 +59,7 @@ export function RegistrarCompraModal({ open, onClose }) {
         unitario = producto.precio_contado;
         break;
       case 2:
-        unitario = producto.precio_contado;
+        unitario = producto.precio_contado / 2;
         break;
       case 3:
         unitario = producto.tres_cuotas;
@@ -370,11 +370,37 @@ export function RegistrarCompraModal({ open, onClose }) {
                     className={`border rounded-xl p-3 flex flex-col justify-between gap-2
                   ${sinStock ? "opacity-50" : ""}`}
                   >
-                    <div>
+                    <div className="space-y-2">
                       <p className="font-medium text-sm">{p.nombre}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Stock: {p.stock}
-                      </p>
+
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Stock: {p.stock}</span>
+                      </div>
+
+                      <div className="text-xs space-y-1">
+                        <p className="font-semibold text-black">
+                          Contado: ${p.precio_contado}
+                        </p>
+
+                        {[3, 6, 9, 12]
+                          .filter((c) => c <= p.cantidad_cuotas)
+                          .map((c) => {
+                            const precio =
+                              c === 3
+                                ? p.tres_cuotas
+                                : c === 6
+                                  ? p.seis_cuotas
+                                  : c === 9
+                                    ? p.nueve_cuotas
+                                    : p.doce_cuotas;
+
+                            return (
+                              <p key={c} className="text-muted-foreground">
+                                {c} cuotas de: ${precio / c}
+                              </p>
+                            );
+                          })}
+                      </div>
                     </div>
 
                     <Button

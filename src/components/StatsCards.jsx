@@ -4,7 +4,7 @@ import {
   getCantidadProductos,
   getVentasDelMes,
   getCantidadClientes,
-  getCantidadEmpleados,
+  getTotalInvertidoStock,
 } from "@/supabase/estadisticas";
 
 const stats = [
@@ -19,8 +19,8 @@ const stats = [
     icon: Users,
   },
   {
-    title: "Trabajadores",
-    value: await getCantidadEmpleados(),
+    title: "Total Invertido en Stock",
+    value: await getTotalInvertidoStock(),
     icon: UserCircle,
   },
   {
