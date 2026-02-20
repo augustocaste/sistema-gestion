@@ -21,25 +21,28 @@ import {
   getCompraById,
 } from "@/supabase/clientes";
 import { PlanPagosModal } from "@/components/modals/PlanPagosModal.jsx";
+import { getFacturasByCompra } from "@/supabase/compras";
+import { FacturasCompra } from "@/components/FacturaCompra.jsx";
 
 export function DetalleCompraModal({
   abierto,
   onCerrar,
   compra,
-  actualizarCompraEnLista, // callback del padre
+  actualizarCompraEnLista,
 }) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [planTotal, setPlanTotal] = useState(null);
   const [compraActual, setCompraActual] = useState(compra);
 
-  // 🔄 Mantener sincronizada la compra cuando cambia la prop
+  const [facturas, setFacturas] = useState([]);
+  const [modalFacturas, setModalFacturas] = useState(false);
+
   useEffect(() => {
     setCompraActual(compra);
   }, [compra]);
 
   if (!compraActual) return null;
 
-  // Abrir PlanPagosModal
   async function handleClick(compraProducto) {
     try {
       const plan = await obtenerPlanCuotasPorProducto(compraProducto.id);
@@ -56,20 +59,22 @@ export function DetalleCompraModal({
     }
   }
 
-  // 🔄 Se llama al cerrar PlanPagosModal
   async function handleCerrarPlanPagos() {
     setModalAbierto(false);
 
-    if (!planTotal) return;
-
     try {
-      // 1️⃣ Recargar la compra actual desde Supabase
       const compraActualizada = await getCompraById(compraActual.id);
       setCompraActual(compraActualizada);
 
-      // 2️⃣ Actualizar la compra en la lista del padre
       if (actualizarCompraEnLista) {
         actualizarCompraEnLista(compraActualizada);
+      }
+
+      const facturasCompra = await getFacturasByCompra(compraActual.id);
+      setFacturas(facturasCompra);
+
+      if (facturasCompra?.length) {
+        setModalFacturas(true);
       }
     } catch (error) {
       console.error("Error al actualizar compra:", error);
@@ -77,112 +82,114 @@ export function DetalleCompraModal({
   }
 
   return (
-    <Dialog open={abierto} onOpenChange={onCerrar}>
-      <DialogContent
-        className="
-          max-h-[80vh]
-          overflow-y-auto
-          overflow-x-hidden
-          w-full
-          md:max-w-4xl
-        "
-      >
-        <DialogHeader>
-          <DialogTitle>Información de la compra</DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={abierto} onOpenChange={onCerrar}>
+        <DialogContent className="max-h-[80vh] overflow-y-auto overflow-x-hidden w-full md:max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Información de la compra</DialogTitle>
+          </DialogHeader>
 
-        <div className="space-y-4 text-sm">
-          <div className="flex justify-between">
-            <span>Fecha</span>
-            <span>{compraActual.fecha}</span>
-          </div>
+          <div className="space-y-4 text-sm">
+            <div className="flex justify-between">
+              <span>Fecha</span>
+              <span>{compraActual.fecha}</span>
+            </div>
 
-          <div className="flex justify-between">
-            <span>Empleado</span>
-            <span>
-              {compraActual.empleados?.nombre}{" "}
-              {compraActual.empleados?.apellido}
-            </span>
-          </div>
+            <div className="flex justify-between">
+              <span>Empleado</span>
+              <span>
+                {compraActual.empleados?.nombre}{" "}
+                {compraActual.empleados?.apellido}
+              </span>
+            </div>
 
-          {/* PRODUCTOS */}
-          <div className="pt-4 border-t space-y-3">
-            <p className="text-base font-semibold">Productos</p>
+            <div className="pt-4 border-t space-y-3">
+              <p className="text-base font-semibold">Productos</p>
 
-            {/* TABLA (desktop) */}
-            <div className="hidden md:block overflow-x-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Producto</TableHead>
-                    <TableHead className="text-right">Monto</TableHead>
-                    <TableHead className="text-right">Cantidad</TableHead>
-                    <TableHead className="text-right">Estado de pago</TableHead>
-                    <TableHead className="text-right">Acción</TableHead>
-                  </TableRow>
-                </TableHeader>
-
-                <TableBody>
-                  {compraActual.compra_producto.map((p) => (
-                    <TableRow key={p.id}>
-                      <TableCell>{p.producto.nombre}</TableCell>
-                      <TableCell className="text-right">${p.monto}</TableCell>
-                      <TableCell className="text-right">{p.cantidad}</TableCell>
-                      <TableCell className="text-right">
-                        <Badge variant="outline">{p.estado_pago}</Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleClick(p)}
-                        >
-                          Ver plan de pagos
-                        </Button>
-                      </TableCell>
+              <div className="hidden md:block overflow-x-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Producto</TableHead>
+                      <TableHead className="text-right">Monto</TableHead>
+                      <TableHead className="text-right">Cantidad</TableHead>
+                      <TableHead className="text-right">Estado</TableHead>
+                      <TableHead className="text-right">Acción</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+                  </TableHeader>
 
-            {/* CARDS (mobile) */}
-            <div className="space-y-3 md:hidden">
-              {compraActual.compra_producto.map((p) => (
-                <div key={p.id} className="rounded-lg border p-3 space-y-2">
-                  <div className="font-medium">{p.producto.nombre}</div>
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Monto</span>
-                    <span>${p.monto}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-muted-foreground">
-                      Estado de pago
-                    </span>
-                    <Badge variant="outline">{p.estado_pago}</Badge>
-                  </div>
+                  <TableBody>
+                    {compraActual.compra_producto.map((p) => (
+                      <TableRow key={p.id}>
+                        <TableCell>{p.producto.nombre}</TableCell>
+                        <TableCell className="text-right">${p.monto}</TableCell>
+                        <TableCell className="text-right">
+                          {p.cantidad}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Badge variant="outline">{p.estado_pago}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleClick(p)}
+                          >
+                            Ver plan
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-2"
-                    onClick={() => handleClick(p)}
-                  >
-                    Ver plan de pagos
-                  </Button>
-                </div>
-              ))}
+              <div className="space-y-3 md:hidden">
+                {compraActual.compra_producto.map((p) => (
+                  <div key={p.id} className="rounded-lg border p-3 space-y-2">
+                    <div className="font-medium">{p.producto.nombre}</div>
+
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>Monto</span>
+                      <span>${p.monto}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="text-muted-foreground">Estado</span>
+                      <Badge variant="outline">{p.estado_pago}</Badge>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-2"
+                      onClick={() => handleClick(p)}
+                    >
+                      Ver plan
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </DialogContent>
+        </DialogContent>
+      </Dialog>
 
-      {/* PlanPagosModal */}
       <PlanPagosModal
         abierto={modalAbierto}
         onCerrar={handleCerrarPlanPagos}
         plan={planTotal}
       />
-    </Dialog>
+
+      <Dialog open={modalFacturas} onOpenChange={setModalFacturas}>
+        <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Facturas de la compra</DialogTitle>
+          </DialogHeader>
+
+          <FacturasCompra facturas={facturas} />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

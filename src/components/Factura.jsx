@@ -16,6 +16,14 @@ const PhoneIcon = () => (
   </svg>
 );
 
+const formatearFechaAR = (fecha) => {
+  if (!fecha) return "";
+
+  const soloFecha = fecha.split("T")[0]; // evita timezone
+  const [y, m, d] = soloFecha.split("-");
+
+  return `${d}/${m}/${y}`;
+};
 export const Factura = forwardRef(function Factura(
   { factura, onPrint, id },
   ref,
@@ -36,7 +44,15 @@ export const Factura = forwardRef(function Factura(
     ? `${compra.cliente.nombre_completo}`
     : "Consumidor final";
 
-  const fechaFactura = compra?.fecha ?? "";
+  const cuotasPagadas = cuotas
+    .filter((c) => c.estado === "pagada" && c.fecha_pagada)
+    .sort(
+      (a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento),
+    );
+
+  const ultimaCuotaPagada = cuotasPagadas[cuotasPagadas.length - 1];
+
+  const fechaFactura = formatearFechaAR(ultimaCuotaPagada?.fecha_pagada);
   const total = factura.monto;
   const cantidad = factura.cantidad ?? 1;
   const precioUnitario = total / cantidad;

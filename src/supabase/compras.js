@@ -60,7 +60,8 @@ export async function getFacturasByCompra(compraId) {
           nro_cuota,
           fecha_vencimiento,
           estado,
-          monto_actual_pagado
+          monto_actual_pagado,
+          fecha_pagada
         )
       )
     `,
