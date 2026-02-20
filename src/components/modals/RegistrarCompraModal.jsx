@@ -59,7 +59,7 @@ export function RegistrarCompraModal({ open, onClose }) {
         unitario = producto.precio_contado;
         break;
       case 2:
-        unitario = producto.precio_contado / 2;
+        unitario = producto.precio_contado;
         break;
       case 3:
         unitario = producto.tres_cuotas;
